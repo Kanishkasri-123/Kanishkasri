@@ -410,7 +410,22 @@ const EnrollmentForm = ({ onClose }) => {
             const res = await api.post('/it-training/enquiry', form);
             if (res.data.success) {
                 setSuccess('✅ Success! Our counselor will call you within 24 hours.');
-                setForm({ name: '', email: '', phone: '', course: '', experience: '', message: '' });
+                
+                // --- WhatsApp Integration ---
+                const message = `🎓 *NEW IT TRAINING APPLICATION*\n━━━━━━━━━━━━━━━━━━━━━━\n👤 *Name:* ${form.name}\n📧 *Email:* ${form.email}\n📞 *Phone:* ${form.phone}\n📚 *Course:* ${form.course}\n🎓 *Experience:* ${form.experience || 'Not Specified'}\n🎯 *Goals:* ${form.message || 'Not Specified'}\n━━━━━━━━━━━━━━━━━━━━━━\n_Sent securely from Sri Kanishka Platform_`;
+                const whatsappUrl = `https://api.whatsapp.com/send?phone=919441809692&text=${encodeURIComponent(message)}`;
+                window.open(whatsappUrl, '_blank');
+                // ----------------------------
+
+                setForm({ 
+                    name: user?.name || '', 
+                    email: user?.email || '', 
+                    phone: user?.phone || '', 
+                    course: '', 
+                    experience: '', 
+                    message: '' 
+                });
+                
                 setTimeout(() => {
                     if (onClose) onClose();
                 }, 3000);
