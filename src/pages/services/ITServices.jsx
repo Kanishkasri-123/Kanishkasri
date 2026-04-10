@@ -414,7 +414,7 @@ const EnrollmentForm = ({ onClose }) => {
                 // --- WhatsApp Integration ---
                 const message = `🎓 *NEW IT TRAINING APPLICATION*\n━━━━━━━━━━━━━━━━━━━━━━\n👤 *Name:* ${form.name}\n📧 *Email:* ${form.email}\n📞 *Phone:* ${form.phone}\n📚 *Course:* ${form.course}\n🎓 *Experience:* ${form.experience || 'Not Specified'}\n🎯 *Goals:* ${form.message || 'Not Specified'}\n━━━━━━━━━━━━━━━━━━━━━━\n_Sent securely from Sri Kanishka Platform_`;
                 const whatsappUrl = `https://api.whatsapp.com/send?phone=919441809692&text=${encodeURIComponent(message)}`;
-                window.open(whatsappUrl, '_blank');
+                window.location.href = whatsappUrl;
                 // ----------------------------
 
                 setForm({ 
