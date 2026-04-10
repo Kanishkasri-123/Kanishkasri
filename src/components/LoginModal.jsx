@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { X, Loader2, Eye, EyeOff } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useUI } from '../context/UIContext';
+import api from '../api/client';
 
 const LoginModal = () => {
     const { isLoginOpen, closeLogin, showToast, loginUser } = useUI();
@@ -20,17 +21,13 @@ const LoginModal = () => {
         setError('');
         setSuccessMsg('');
         
-        const endpoint = isSignup ? 'register' : 'login';
+        const endpoint = isSignup ? '/auth/register' : '/auth/login';
         const payload = isSignup ? { name, email, password } : { email, password };
         try {
-            const res = await fetch(`http://localhost:5000/api/auth/${endpoint}`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
-            });
-            const data = await res.json();
+            const res = await api.post(endpoint, payload);
+            const data = res.data;
             
-            if (res.ok && data.success) {
+            if (data.success) {
                 if (isSignup) {
                     // Registration success → switch to Login form
                     setIsSignup(false);
@@ -48,7 +45,7 @@ const LoginModal = () => {
                 setError(data.message || (isSignup ? 'Registration failed' : 'Login failed'));
             }
         } catch (err) {
-            setError('Could not connect to server. Is it running?');
+            setError(err.response?.data?.message || 'Could not connect to server. Is it running?');
         } finally {
             setIsLoading(false);
         }

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Save, Edit3, LogOut, Loader2, CheckCircle, User as UserIcon } from 'lucide-react';
 import { useUI } from '../context/UIContext';
+import api from '../api/client';
 
 const ProfileModal = () => {
     const { isProfileOpen, closeProfile, matrimonyProfile, setMatrimonyProfile, matrimonyLogoutUser, showToast } = useUI();
@@ -34,23 +35,17 @@ const ProfileModal = () => {
         setStatus('loading');
 
         try {
-            const token = localStorage.getItem('matToken');
-            const res = await fetch('http://localhost:5000/api/matrimony/me', {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: `Bearer ${token}`
-                },
-                body: JSON.stringify(formData)
+            const token = sessionStorage.getItem('matToken');
+            const res = await api.put('/matrimony/me', formData, {
+                headers: { Authorization: `Bearer ${token}` }
             });
 
-            const data = await res.json();
-            if (res.ok && data.success) {
-                setMatrimonyProfile(data.data.profile);
+            if (res.data.success) {
+                setMatrimonyProfile(res.data.data.profile);
                 showToast('Profile updated successfully!', 'success');
                 setIsEditing(false);
             } else {
-                showToast(data.message || 'Failed to update profile', 'error');
+                showToast(res.data.message || 'Failed to update profile', 'error');
             }
         } catch (err) {
             showToast('Network error while updating', 'error');

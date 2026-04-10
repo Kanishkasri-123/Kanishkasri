@@ -9,7 +9,7 @@ const client = axios.create({
 
 // Attach JWT token if user is logged in
 client.interceptors.request.use((config) => {
-    const token = localStorage.getItem('token');
+    const token = sessionStorage.getItem('token');
     if (token) {
         config.headers.Authorization = `Bearer ${token}`;
     }

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Send, Loader2, CheckCircle, ShieldCheck, ArrowRight, User, CreditCard, FileText } from 'lucide-react';
 import { useUI } from '../context/UIContext';
+import api from '../api/client';
 
 const ServiceModal = () => {
     const { serviceModal, closeServiceModal, setMatrimonyProfile, matrimonyProfile, matrimonyLoginUser, showToast } = useUI();
@@ -84,13 +85,9 @@ const ServiceModal = () => {
         setStatus('loading'); setError('');
         try {
             if (isMatLoginMode) {
-                const res = await fetch('http://localhost:5000/api/matrimony/login', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ email: basicData.email, password: basicData.password }),
-                });
-                const data = await res.json();
-                if (res.ok && data.success) {
+                const res = await api.post('/matrimony/login', { email: basicData.email, password: basicData.password });
+                const data = res.data;
+                if (data.success) {
                     matrimonyLoginUser(data.data.profile, data.data.token);
                     
                     if (data.data.profile.paymentStatus === 'paid') {
@@ -117,10 +114,10 @@ const ServiceModal = () => {
             Object.keys(basicData).forEach(k => fd.append(k, basicData[k]));
             if (profilePhoto) fd.append('profilePhoto', profilePhoto);
 
-            const res = await fetch('http://localhost:5000/api/matrimony/register', { method: 'POST', body: fd });
-            const data = await res.json();
+            const res = await api.post('/matrimony/register', fd);
+            const data = res.data;
 
-            if (res.ok && data.success) {
+            if (data.success) {
                 matrimonyLoginUser(data.data.profile, data.data.token);
                 setMatStep(2); // → go to payment
                 setStatus('idle');
@@ -135,15 +132,13 @@ const ServiceModal = () => {
     // ── STEP 2: Payment ───────────────────────────────────────────────
     const handlePayment = async () => {
         setStatus('payment_loading'); setError('');
-        const matToken = localStorage.getItem('matToken');
+        const matToken = sessionStorage.getItem('matToken');
         try {
-            const res = await fetch(`http://localhost:5000/api/matrimony/${matrimonyProfile.id}/pay`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${matToken}` },
-                body: JSON.stringify({ simulateSuccess: true }),
+            const res = await api.post(`/matrimony/${matrimonyProfile.id}/pay`, { simulateSuccess: true }, {
+                headers: { Authorization: `Bearer ${matToken}` }
             });
-            const data = await res.json();
-            if (res.ok && data.success) {
+            const data = res.data;
+            if (data.success) {
                 setMatrimonyProfile(data.data.profile);
                 setMatStep(3); // → go to bio data
                 setStatus('idle');
@@ -159,15 +154,13 @@ const ServiceModal = () => {
     const handleBioSubmit = async (e) => {
         e.preventDefault();
         setStatus('biodata_loading'); setError('');
-        const matToken = localStorage.getItem('matToken');
+        const matToken = sessionStorage.getItem('matToken');
         try {
-            const res = await fetch('http://localhost:5000/api/matrimony/me', {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${matToken}` },
-                body: JSON.stringify(bioData),
+            const res = await api.put('/matrimony/me', bioData, {
+                headers: { Authorization: `Bearer ${matToken}` }
             });
-            const data = await res.json();
-            if (res.ok && data.success) {
+            const data = res.data;
+            if (data.success) {
                 setMatrimonyProfile(data.data.profile);
                 setStatus('done');
             } else {
@@ -183,9 +176,9 @@ const ServiceModal = () => {
         e.preventDefault();
         setStatus('loading'); setError('');
         try {
-            let endpoint = 'http://localhost:5000/api/it-training/enquiry';
-            if (serviceModal.type === 'abroad') endpoint = 'http://localhost:5000/api/abroad/enquiry';
-            else if (serviceModal.type === 'real-estate') endpoint = 'http://localhost:5000/api/real-estate/contact';
+            let endpoint = '/it-training/enquiry';
+            if (serviceModal.type === 'abroad') endpoint = '/abroad/enquiry';
+            else if (serviceModal.type === 'real-estate') endpoint = '/real-estate/contact';
 
             const payload = { 
                 ...otherForm, 
@@ -193,13 +186,9 @@ const ServiceModal = () => {
                 name: `${otherForm.firstName || ''} ${otherForm.lastName || ''}`.trim() 
             };
 
-            const res = await fetch(endpoint, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload),
-            });
-            const data = await res.json();
-            if (res.ok && data.success) { setStatus('done'); }
+            const res = await api.post(endpoint, payload);
+            const data = res.data;
+            if (data.success) { setStatus('done'); }
             else { setError(data.message || 'Submission failed.'); setStatus('idle'); }
         } catch {
             setError('Could not connect to server.'); setStatus('idle');

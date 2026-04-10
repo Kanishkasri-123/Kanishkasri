@@ -27,8 +27,8 @@ export const UIProvider = ({ children }) => {
 
     // Initial auth check
     useEffect(() => {
-        const storedToken = localStorage.getItem('token');
-        const storedMatToken = localStorage.getItem('matToken');
+        const storedToken = sessionStorage.getItem('token');
+        const storedMatToken = sessionStorage.getItem('matToken');
         
         if (storedToken) {
             setToken(storedToken);
@@ -50,14 +50,14 @@ export const UIProvider = ({ children }) => {
         setToken(newToken);
         setUser(userData);
         setIsLoggedIn(true);
-        localStorage.setItem('token', newToken);
+        sessionStorage.setItem('token', newToken);
     };
 
     const logoutUser = () => {
         setIsLoggedIn(false);
         setUser(null);
         setToken(null);
-        localStorage.removeItem('token');
+        sessionStorage.removeItem('token');
         showToast('Successfully logged out from Global Account', 'success');
     };
 
@@ -65,13 +65,13 @@ export const UIProvider = ({ children }) => {
     const matrimonyLoginUser = (profileData, jwtToken) => {
         setMatrimonyProfile(profileData);
         setMatToken(jwtToken);
-        localStorage.setItem('matToken', jwtToken);
+        sessionStorage.setItem('matToken', jwtToken);
     };
 
     const matrimonyLogoutUser = () => {
         setMatrimonyProfile(null);
         setMatToken(null);
-        localStorage.removeItem('matToken');
+        sessionStorage.removeItem('matToken');
         showToast('Logged out of Matrimony Dashboard', 'success');
     };
 
