@@ -37,7 +37,7 @@ function AdminLayout({ children }) {
 export default function App() {
   return (
     <AdminAuthProvider>
-      <Router basename="/admin">
+      <Router>
         <Routes>
           <Route path="/login" element={<Login />} />
           <Route path="/" element={<Navigate to="/dashboard" replace />} />
