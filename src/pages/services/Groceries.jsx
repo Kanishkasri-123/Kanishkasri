@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ShoppingCart, Leaf, Clock, MapPin, ArrowRight, CheckCircle, Package, Truck, Tag, Star, Eye, X } from 'lucide-react';
 import { useUI } from '../../context/UIContext';
+import api from '../../api/client';
 
 const Groceries = () => {
     const { openServiceModal } = useUI();
@@ -12,9 +13,8 @@ const Groceries = () => {
     const [selectedProduct, setSelectedProduct] = useState(null);
 
     useEffect(() => {
-        fetch('http://localhost:5000/api/groceries/products')
-            .then(r => r.json())
-            .then(data => { if (data.success) setProducts(data.data); })
+        api.get('/groceries/products')
+            .then(res => { if (res.data.success) setProducts(res.data.data); })
             .catch(() => {})
             .finally(() => setLoadingProducts(false));
     }, []);
@@ -148,7 +148,7 @@ const Groceries = () => {
                                         <div className="relative h-44 bg-gray-50 overflow-hidden">
                                             {product.image_url ? (
                                                 <img
-                                                    src={`http://localhost:5000${product.image_url}`}
+                                                    src={`${api.defaults.baseURL.replace('/api', '')}${product.image_url}`}
                                                     alt={product.name}
                                                     className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                                                 />
@@ -240,7 +240,7 @@ const Groceries = () => {
                                 {/* Image Header */}
                                 <div className="relative h-64 bg-gray-50">
                                     {p.image_url ? (
-                                        <img src={`http://localhost:5000${p.image_url}`} alt={p.name} className="w-full h-full object-cover" />
+                                        <img src={`${api.defaults.baseURL.replace('/api', '')}${p.image_url}`} alt={p.name} className="w-full h-full object-cover" />
                                     ) : (
                                         <div className="w-full h-full flex items-center justify-center text-8xl">🥗</div>
                                     )}
