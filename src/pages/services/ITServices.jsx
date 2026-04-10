@@ -388,7 +388,15 @@ const COURSE_OPTIONS = [
 ];
 
 const EnrollmentForm = ({ onClose }) => {
-    const [form, setForm] = useState({ name: '', email: '', phone: '', course: '', experience: '', message: '' });
+    const { user } = useUI();
+    const [form, setForm] = useState({ 
+        name: user?.name || '', 
+        email: user?.email || '', 
+        phone: user?.phone || '', 
+        course: '', 
+        experience: '', 
+        message: '' 
+    });
     const [loading, setLoading] = useState(false);
     const [success, setSuccess] = useState('');
     const [error, setError] = useState('');

@@ -1,6 +1,8 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { CheckCircle, XCircle, X } from 'lucide-react';
+import api from '../api/client';
+
 
 const UIContext = createContext();
 
@@ -31,19 +33,15 @@ export const UIProvider = ({ children }) => {
         if (storedToken) {
             setToken(storedToken);
             setIsLoggedIn(true);
-            const headers = { Authorization: `Bearer ${storedToken}` };
-            fetch('http://localhost:5000/api/auth/me', { headers })
-                .then(res => res.json())
-                .then(data => { if (data.success) setUser(data.data.user); })
+            api.get('/auth/me', { headers: { Authorization: `Bearer ${storedToken}` } })
+                .then(res => { if (res.data.success) setUser(res.data.data.user); })
                 .catch(() => {});
         }
 
         if (storedMatToken) {
             setMatToken(storedMatToken);
-            const headers = { Authorization: `Bearer ${storedMatToken}` };
-            fetch('http://localhost:5000/api/matrimony/me', { headers })
-                .then(res => res.json())
-                .then(data => { if (data.success) setMatrimonyProfile(data.data.profile); })
+            api.get('/matrimony/me', { headers: { Authorization: `Bearer ${storedMatToken}` } })
+                .then(res => { if (res.data.success) setMatrimonyProfile(res.data.data.profile); })
                 .catch(() => {});
         }
     }, []);
