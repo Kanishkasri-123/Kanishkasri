@@ -33,6 +33,11 @@ app.use(
         return callback(null, true);
       }
       
+      // Automatically allow requests from any Vercel domain (the frontend and admin)
+      if (origin && origin.endsWith('.vercel.app')) {
+        return callback(null, true);
+      }
+      
       const allowedOrigins = [
         process.env.FRONTEND_URL,
         process.env.ADMIN_URL,
