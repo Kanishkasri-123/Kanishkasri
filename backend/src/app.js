@@ -59,6 +59,11 @@ app.get('/api/health', (_req, res) => {
   res.json({ success: true, status: 'ok', timestamp: new Date().toISOString() });
 });
 
+// ── Root Welcome Route ───────────────────────────────────────────────────────
+app.get('/', (_req, res) => {
+  res.json({ success: true, message: 'Welcome to Sri Kanishka Associates API', version: '1.0.0' });
+});
+
 // ── Routes ───────────────────────────────────────────────────────────────────
 app.use('/api/auth', authRoutes);
 app.use('/api/matrimony', matrimonyRoutes);
