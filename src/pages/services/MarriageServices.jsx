@@ -76,9 +76,29 @@ const MarriageServices = () => {
 
 
                             {/* Dynamic Hero Buttons */}
-                            <div className="flex flex-col items-start gap-4 mb-8">
-                                <div className="flex flex-wrap items-center gap-4">
-                                    {!matrimonyProfile ? (
+                            <div className="flex flex-wrap items-center gap-4 mb-8">
+                                {!matrimonyProfile && (
+                                    <motion.div 
+                                        initial={{ opacity: 0 }}
+                                        animate={{ opacity: 1 }}
+                                        transition={{ delay: 0.5 }}
+                                        onClick={() => {
+                                            const section = document.getElementById('registration-section');
+                                            if (section) section.scrollIntoView({ behavior: 'smooth' });
+                                        }}
+                                        className="flex items-center gap-2 text-gray-900 font-bold bg-white/60 px-6 py-3.5 rounded-full backdrop-blur-md shadow-lg border border-white/50 cursor-pointer hover:bg-white hover:shadow-xl transition-all"
+                                    >
+                                        <span className="text-sm">For registration see downside</span>
+                                        <motion.div
+                                            animate={{ y: [0, 4, 0] }}
+                                            transition={{ repeat: Infinity, duration: 1.5, ease: 'easeInOut' }}
+                                        >
+                                            <ArrowDown size={16} className="text-rose-600" />
+                                        </motion.div>
+                                    </motion.div>
+                                )}
+
+                                {!matrimonyProfile ? (
                                     <motion.button
                                         onClick={handleLoginClick}
                                         whileHover={{ scale: 1.05 }}
@@ -133,27 +153,6 @@ const MarriageServices = () => {
                                             <span>My Profile</span>
                                         </motion.button>
                                     </>
-                                )}
-                                </div>
-                                {!matrimonyProfile && (
-                                    <motion.div 
-                                        initial={{ opacity: 0 }}
-                                        animate={{ opacity: 1 }}
-                                        transition={{ delay: 0.5 }}
-                                        onClick={() => {
-                                            const section = document.getElementById('registration-section');
-                                            if (section) section.scrollIntoView({ behavior: 'smooth' });
-                                        }}
-                                        className="flex items-center gap-2 mt-1 text-gray-900 font-bold bg-white/60 px-5 py-2.5 rounded-full backdrop-blur-md shadow-lg border border-white/50 cursor-pointer hover:bg-white hover:shadow-xl transition-all"
-                                    >
-                                        <span className="text-sm">For registration see downside</span>
-                                        <motion.div
-                                            animate={{ y: [0, 4, 0] }}
-                                            transition={{ repeat: Infinity, duration: 1.5, ease: 'easeInOut' }}
-                                        >
-                                            <ArrowDown size={16} className="text-rose-600" />
-                                        </motion.div>
-                                    </motion.div>
                                 )}
                             </div>
 
