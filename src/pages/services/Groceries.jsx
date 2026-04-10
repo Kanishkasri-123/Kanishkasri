@@ -1,11 +1,23 @@
-import React, { useState } from 'react';
-import { motion } from 'framer-motion';
-import { ShoppingCart, Leaf, Clock, MapPin, ArrowRight, Sparkles, CheckCircle, Package, Truck } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { ShoppingCart, Leaf, Clock, MapPin, ArrowRight, CheckCircle, Package, Truck, Tag, Star, Eye, X } from 'lucide-react';
 import { useUI } from '../../context/UIContext';
 
 const Groceries = () => {
     const { openServiceModal } = useUI();
     const [activeTab, setActiveTab] = useState('fresh');
+    const [products, setProducts] = useState([]);
+    const [loadingProducts, setLoadingProducts] = useState(true);
+    const [activeCategory, setActiveCategory] = useState('all');
+    const [selectedProduct, setSelectedProduct] = useState(null);
+
+    useEffect(() => {
+        fetch('http://localhost:5000/api/groceries/products')
+            .then(r => r.json())
+            .then(data => { if (data.success) setProducts(data.data); })
+            .catch(() => {})
+            .finally(() => setLoadingProducts(false));
+    }, []);
 
     return (
         <div className="pt-3 min-h-screen">
@@ -76,46 +88,261 @@ const Groceries = () => {
                 </div>
             </section>
 
-            {/* Products / Selection */}
-            <div className="container-custom pb-20 mt-10">
-                <div className="text-center max-w-2xl mx-auto mb-12">
-                    <span className="text-orange-600 font-bold tracking-widest uppercase text-xs mb-3 block">Premium Selection</span>
-                    <h2 className="text-3xl md:text-4xl font-bold text-gray-900 font-display">Quality You Can Trust</h2>
+            {/* Live Product Catalog */}
+            <div className="container-custom pb-10 mt-10">
+                <div className="text-center max-w-2xl mx-auto mb-10">
+                    <span className="text-orange-600 font-bold tracking-widest uppercase text-xs mb-3 block">Live Catalog</span>
+                    <h2 className="text-3xl md:text-4xl font-bold text-gray-900 font-display">Our Premium Products</h2>
+                    <p className="text-gray-500 mt-3 text-base">Handpicked premium items, added fresh from our farm partners.</p>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                    {[
-                        { title: "Single Origin Desi Cow Ghee", category: "Organic", price: "₹1,200/kg", img: "https://images.unsplash.com/photo-1550583724-1255818c0533?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" },
-                        { title: "Stone Ground Multigrain Atta", category: "Staples", price: "₹85/kg", img: "https://images.unsplash.com/photo-1509440159596-0249088772ff?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" },
-                        { title: "Cold Pressed Coconut Oil", category: "Essential Oils", price: "₹450/ltr", img: "https://images.unsplash.com/photo-1474979266404-7eaacbadcbaf?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" },
-                        { title: "Heritage Red Rice", category: "Traditional Grains", price: "₹120/kg", img: "https://images.unsplash.com/photo-1586201375761-83865001e31c?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" },
-                        { title: "Raw Wild Forest Honey", category: "Natural Sweetener", price: "₹650/500g", img: "https://images.unsplash.com/photo-1587049352846-4a222e784d38?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" },
-                        { title: "Farm Picked Seasonal Basket", category: "Fresh Produce", price: "₹499/basket", img: "https://images.unsplash.com/photo-1542838132-92c53300491e?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" }
-                    ].map((item, idx) => (
-                        <div key={idx} className="bg-white rounded-[2rem] overflow-hidden shadow-lg border border-gray-100 group transition-all duration-300 hover:shadow-xl">
-                            <div className="h-48 relative overflow-hidden">
-                                <img src={item.img} alt={item.title} className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700" />
-                                <div className="absolute top-4 left-4 bg-orange-600 text-white px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest">
-                                    {item.category}
+                {/* Category Filter Bar */}
+                {products.length > 0 && (
+                    <div className="flex flex-wrap gap-2 justify-center mb-10">
+                        {['all', ...new Set(products.map(p => p.category))].map(cat => (
+                            <button
+                                key={cat}
+                                onClick={() => setActiveCategory(cat)}
+                                className={`px-5 py-2 rounded-full text-sm font-bold transition-all ${activeCategory === cat ? 'bg-orange-600 text-white shadow-md shadow-orange-200' : 'bg-white text-gray-600 border border-gray-200 hover:border-orange-300 hover:text-orange-600'}`}
+                            >
+                                {cat === 'all' ? '🛒 All Products' : cat}
+                            </button>
+                        ))}
+                    </div>
+                )}
+
+                {/* Product Grid */}
+                {loadingProducts ? (
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+                        {[...Array(8)].map((_, i) => (
+                            <div key={i} className="bg-white rounded-2xl h-72 animate-pulse border border-gray-100">
+                                <div className="h-44 bg-gray-100 rounded-t-2xl" />
+                                <div className="p-4 space-y-2">
+                                    <div className="h-3 bg-gray-100 rounded w-3/4" />
+                                    <div className="h-3 bg-gray-100 rounded w-1/2" />
                                 </div>
                             </div>
-                            <div className="p-6">
-                                <h3 className="text-lg font-bold text-gray-900 mb-2 font-display">{item.title}</h3>
-                                <div className="flex items-center justify-between mt-4">
-                                    <span className="text-orange-600 font-bold text-xl">{item.price}</span>
-                                    <button 
-                                        onClick={() => openServiceModal('groceries', `Inquiry: ${item.title}`)}
-                                        className="p-3 bg-orange-50 text-orange-600 rounded-xl hover:bg-orange-600 hover:text-white transition-colors"
+                        ))}
+                    </div>
+                ) : products.length === 0 ? (
+                    <div className="text-center py-20 bg-white rounded-3xl border border-dashed border-gray-200">
+                        <div className="text-6xl mb-4">🛒</div>
+                        <h3 className="text-xl font-bold text-gray-700 mb-2">Coming Soon!</h3>
+                        <p className="text-gray-400 max-w-xs mx-auto">Our team is curating the finest organic products. Check back soon or subscribe below.</p>
+                    </div>
+                ) : (
+                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
+                        {products
+                            .filter(p => activeCategory === 'all' || p.category === activeCategory)
+                            .map((product, idx) => {
+                                const discount = parseFloat(product.discount_percent);
+                                return (
+                                    <motion.div
+                                        key={product.id}
+                                        initial={{ opacity: 0, y: 20 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        transition={{ delay: idx * 0.05 }}
+                                        className="bg-white rounded-2xl overflow-hidden shadow-sm border border-gray-100 group hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col"
                                     >
-                                        <ShoppingCart size={20} />
+                                        {/* Image */}
+                                        <div className="relative h-44 bg-gray-50 overflow-hidden">
+                                            {product.image_url ? (
+                                                <img
+                                                    src={`http://localhost:5000${product.image_url}`}
+                                                    alt={product.name}
+                                                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                                                />
+                                            ) : (
+                                                <div className="w-full h-full flex items-center justify-center text-5xl">🥗</div>
+                                            )}
+                                            {discount > 0 && (
+                                                <div className="absolute top-2 left-2 bg-green-500 text-white text-[10px] font-black px-2 py-1 rounded-md">
+                                                    {Math.round(discount)}% OFF
+                                                </div>
+                                            )}
+                                            {product.stock <= 10 && product.stock > 0 && (
+                                                <div className="absolute top-2 right-2 bg-orange-500 text-white text-[9px] font-bold px-2 py-1 rounded-md">
+                                                    Only {product.stock} left
+                                                </div>
+                                            )}
+                                            {product.stock === 0 && (
+                                                <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
+                                                    <span className="bg-red-500 text-white text-xs font-bold px-3 py-1 rounded-full">Out of Stock</span>
+                                                </div>
+                                            )}
+                                        </div>
+
+                                        {/* Details */}
+                                        <div className="p-4 flex flex-col flex-1">
+                                            {product.brand && (
+                                                <p className="text-[10px] font-bold text-orange-600 uppercase tracking-wider mb-1">{product.brand}</p>
+                                            )}
+                                            <h3 className="text-sm font-bold text-gray-900 leading-snug mb-2 line-clamp-2">{product.name}</h3>
+                                            {product.weight && (
+                                                <p className="text-[11px] text-gray-400 mb-3">{product.weight}</p>
+                                            )}
+                                            <div className="mt-auto">
+                                                <div className="flex items-baseline gap-2 mb-3">
+                                                    <span className="text-lg font-black text-orange-600">₹{product.selling_price}</span>
+                                                    {discount > 0 && (
+                                                        <span className="text-xs text-gray-400 line-through">₹{product.mrp}</span>
+                                                    )}
+                                                </div>
+                                                {/* Two-button row */}
+                                                <div className="flex gap-2">
+                                                    <button
+                                                        onClick={() => setSelectedProduct(product)}
+                                                        className="flex-1 py-2.5 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition-all bg-gray-50 text-gray-700 hover:bg-gray-100 border border-gray-200"
+                                                    >
+                                                        <Eye size={13} /> Details
+                                                    </button>
+                                                    <button
+                                                        onClick={() => openServiceModal('groceries', `Order: ${product.name}`)}
+                                                        disabled={product.stock === 0}
+                                                        className={`flex-1 py-2.5 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition-all ${product.stock === 0 ? 'bg-gray-100 text-gray-400 cursor-not-allowed' : 'bg-orange-50 text-orange-700 hover:bg-orange-600 hover:text-white hover:shadow-md hover:shadow-orange-200'}`}
+                                                    >
+                                                        <ShoppingCart size={13} />
+                                                        {product.stock === 0 ? 'Sold Out' : 'Order'}
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </motion.div>
+                                );
+                            })}
+                    </div>
+                )}
+            </div>
+
+            {/* ── PRODUCT DETAIL MODAL ─────────────────────────────────────── */}
+            <AnimatePresence>
+                {selectedProduct && (() => {
+                    const p = selectedProduct;
+                    const disc = parseFloat(p.discount_percent);
+                    return (
+                        <motion.div
+                            key="product-modal-backdrop"
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            onClick={() => setSelectedProduct(null)}
+                            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
+                        >
+                            <motion.div
+                                key="product-modal"
+                                initial={{ opacity: 0, scale: 0.92, y: 30 }}
+                                animate={{ opacity: 1, scale: 1, y: 0 }}
+                                exit={{ opacity: 0, scale: 0.92, y: 30 }}
+                                transition={{ type: 'spring', stiffness: 300, damping: 28 }}
+                                onClick={e => e.stopPropagation()}
+                                className="bg-white rounded-3xl overflow-hidden w-full max-w-2xl shadow-2xl"
+                            >
+                                {/* Image Header */}
+                                <div className="relative h-64 bg-gray-50">
+                                    {p.image_url ? (
+                                        <img src={`http://localhost:5000${p.image_url}`} alt={p.name} className="w-full h-full object-cover" />
+                                    ) : (
+                                        <div className="w-full h-full flex items-center justify-center text-8xl">🥗</div>
+                                    )}
+                                    {/* Overlays */}
+                                    {disc > 0 && (
+                                        <div className="absolute top-4 left-4 bg-green-500 text-white text-xs font-black px-3 py-1.5 rounded-lg shadow-lg">
+                                            {Math.round(disc)}% OFF
+                                        </div>
+                                    )}
+                                    <button
+                                        onClick={() => setSelectedProduct(null)}
+                                        className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm p-2 rounded-full shadow-md hover:bg-white transition-colors"
+                                    >
+                                        <X size={18} className="text-gray-700" />
                                     </button>
                                 </div>
-                            </div>
-                        </div>
-                    ))}
-                </div>
-                
-                <div className="mt-16 bg-white rounded-[2.5rem] p-8 md:p-12 shadow-xl border border-gray-100 flex flex-col md:flex-row gap-12 items-center">
+
+                                {/* Content */}
+                                <div className="p-6">
+                                    {/* Brand + Category */}
+                                    <div className="flex items-center gap-2 mb-3">
+                                        {p.brand && <span className="text-xs font-bold text-orange-600 uppercase tracking-wider">{p.brand}</span>}
+                                        {p.brand && p.category && <span className="text-gray-300">•</span>}
+                                        {p.category && <span className="text-xs text-gray-400 font-medium">{p.category}</span>}
+                                    </div>
+
+                                    <h2 className="text-2xl font-bold text-gray-900 mb-4 font-display leading-snug">{p.name}</h2>
+
+                                    {/* Price Row */}
+                                    <div className="flex items-center gap-4 mb-4">
+                                        <div>
+                                            <span className="text-3xl font-black text-orange-600">₹{p.selling_price}</span>
+                                            {disc > 0 && (
+                                                <span className="ml-2 text-base text-gray-400 line-through font-medium">₹{p.mrp}</span>
+                                            )}
+                                        </div>
+                                        {disc > 0 && (
+                                            <span className="px-3 py-1 bg-green-50 text-green-700 text-sm font-bold rounded-full border border-green-100">
+                                                Save ₹{(parseFloat(p.mrp) - parseFloat(p.selling_price)).toFixed(0)}
+                                            </span>
+                                        )}
+                                    </div>
+
+                                    {/* Specs Grid */}
+                                    <div className="grid grid-cols-3 gap-3 mb-4">
+                                        {p.weight && (
+                                            <div className="bg-gray-50 rounded-xl p-3 text-center">
+                                                <div className="text-[10px] text-gray-400 uppercase font-bold mb-1">Weight</div>
+                                                <div className="text-sm font-bold text-gray-800">{p.weight}</div>
+                                            </div>
+                                        )}
+                                        <div className="bg-gray-50 rounded-xl p-3 text-center">
+                                            <div className="text-[10px] text-gray-400 uppercase font-bold mb-1">Stock</div>
+                                            <div className={`text-sm font-bold ${p.stock === 0 ? 'text-red-500' : p.stock <= 10 ? 'text-orange-500' : 'text-green-600'}`}>
+                                                {p.stock === 0 ? 'Out' : p.stock <= 10 ? `${p.stock} left` : 'In Stock'}
+                                            </div>
+                                        </div>
+                                        <div className="bg-gray-50 rounded-xl p-3 text-center">
+                                            <div className="text-[10px] text-gray-400 uppercase font-bold mb-1">Quality</div>
+                                            <div className="text-sm font-bold text-gray-800">Premium</div>
+                                        </div>
+                                    </div>
+
+                                    {/* Description */}
+                                    {p.description && (
+                                        <div className="mb-6">
+                                            <h4 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">About this product</h4>
+                                            <p className="text-sm text-gray-600 leading-relaxed">{p.description}</p>
+                                        </div>
+                                    )}
+
+                                    {/* CTA Row */}
+                                    <div className="flex gap-3">
+                                        <button
+                                            onClick={() => { setSelectedProduct(null); openServiceModal('groceries', `Order: ${p.name}`); }}
+                                            disabled={p.stock === 0}
+                                            className={`flex-1 py-3.5 rounded-2xl font-bold text-sm flex items-center justify-center gap-2 transition-all shadow-md ${
+                                                p.stock === 0
+                                                    ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                                                    : 'bg-gradient-to-r from-orange-500 to-amber-500 text-white hover:shadow-orange-200 hover:shadow-lg hover:-translate-y-0.5'
+                                            }`}
+                                        >
+                                            <ShoppingCart size={16} />
+                                            {p.stock === 0 ? 'Out of Stock' : 'Order Now'}
+                                        </button>
+                                        <button
+                                            onClick={() => setSelectedProduct(null)}
+                                            className="px-5 py-3.5 rounded-2xl font-bold text-sm text-gray-600 bg-gray-100 hover:bg-gray-200 transition-colors"
+                                        >
+                                            Close
+                                        </button>
+                                    </div>
+                                </div>
+                            </motion.div>
+                        </motion.div>
+                    );
+                })()}
+            </AnimatePresence>
+
+            {/* Subscription Section */}
+            <div className="container-custom pb-20">
+                <div className="bg-white rounded-[2.5rem] p-8 md:p-12 shadow-xl border border-gray-100 flex flex-col md:flex-row gap-12 items-center">
                     <div className="flex-1">
                         <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-orange-50 text-orange-700 font-bold text-xs uppercase tracking-wider mb-6">
                             Monthly Subscription

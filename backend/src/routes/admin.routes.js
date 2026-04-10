@@ -88,4 +88,39 @@ router.delete('/users/:id', async (req, res, next) => {
   }
 })
 
+/**
+ * DELETE /api/admin/matrimony-profiles/:id
+ * Hard-delete a matrimony profile
+ */
+router.delete('/matrimony-profiles/:id', async (req, res, next) => {
+  try {
+    const { id } = req.params
+    const deleted = await matrimonyRepo.deleteById(id)
+    if (!deleted) return res.status(404).json({ success: false, message: 'Profile not found.' })
+    res.json({ success: true, message: 'Profile deleted successfully.' })
+  } catch (err) {
+    next(err)
+  }
+})
+
+/**
+ * PATCH /api/admin/matrimony-profiles/:id
+ * Update status or paymentStatus of a matrimony profile
+ */
+router.patch('/matrimony-profiles/:id', async (req, res, next) => {
+  try {
+    const { id } = req.params
+    const { status, paymentStatus, profileData } = req.body
+    const updates = {}
+    if (status) updates.status = status
+    if (paymentStatus) updates.paymentStatus = paymentStatus
+    if (profileData) updates.profileData = profileData
+    const updated = await matrimonyRepo.updateById(id, updates)
+    if (!updated) return res.status(404).json({ success: false, message: 'Profile not found.' })
+    res.json({ success: true, message: 'Profile updated.', data: updated })
+  } catch (err) {
+    next(err)
+  }
+})
+
 module.exports = router

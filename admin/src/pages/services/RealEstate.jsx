@@ -1,6 +1,4 @@
-import React, { useState } from 'react'
-
-const PROPERTIES = []
+import React, { useState, useEffect } from 'react'
 
 const ENQUIRIES = []
 
@@ -14,14 +12,27 @@ const STATUS_COLORS = {
 }
 
 export default function RealEstate() {
+  const [PROPERTIES, setPROPERTIES] = useState([]);
   const [tab, setTab] = useState('properties')
   const [search, setSearch] = useState('')
   const [typeFilter, setTypeFilter] = useState('all')
 
+  useEffect(() => {
+    fetch('http://localhost:5000/api/real-estate')
+      .then(res => res.json())
+      .then(data => {
+        if(data.success && data.data) {
+          setPROPERTIES(data.data);
+        }
+      })
+      .catch(console.error);
+  }, []);
+
   const filteredProps = PROPERTIES.filter(p => {
-    const match = p.title.toLowerCase().includes(search.toLowerCase()) || p.location.toLowerCase().includes(search.toLowerCase())
+    const titleMatch = p.title ? p.title.toLowerCase().includes(search.toLowerCase()) : false;
+    const locMatch = p.location ? p.location.toLowerCase().includes(search.toLowerCase()) : false;
     const matchType = typeFilter === 'all' || p.type === typeFilter
-    return match && matchType
+    return (titleMatch || locMatch) && matchType
   })
 
   const stats = [
@@ -98,9 +109,9 @@ export default function RealEstate() {
                     </td>
                     <td style={{ fontSize: '0.82rem', color: 'var(--text-secondary)' }}>{p.type}</td>
                     <td style={{ fontSize: '0.875rem', fontWeight: 600, color: 'var(--brand-primary)' }}>{p.price}</td>
-                    <td style={{ fontSize: '0.82rem', color: 'var(--text-secondary)' }}>{p.area}</td>
-                    <td style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>{p.enquiries}</td>
-                    <td><span className={`badge ${STATUS_COLORS[p.status]}`}>{p.status}</span></td>
+                    <td style={{ fontSize: '0.82rem', color: 'var(--text-secondary)' }}>{p.size || p.area || '-'}</td>
+                    <td style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>{0}</td>
+                    <td><span className={`badge ${STATUS_COLORS[p.status || 'available']}`}>{p.status || 'available'}</span></td>
                   </tr>
                 ))}
               </tbody>

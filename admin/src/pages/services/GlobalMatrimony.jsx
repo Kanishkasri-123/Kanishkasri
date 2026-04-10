@@ -23,6 +23,13 @@ const STATUS_COLORS = {
   unpaid: 'badge-danger',
 }
 
+const Field = ({ label, value }) => (
+  <div style={{ padding: '10px 14px', background: 'rgba(255,255,255,0.03)', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.06)' }}>
+    <div style={{ fontSize: '0.65rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--text-muted)', marginBottom: '4px' }}>{label}</div>
+    <div style={{ fontSize: '0.875rem', color: 'var(--text-primary)', fontWeight: 500 }}>{value || '—'}</div>
+  </div>
+)
+
 export default function GlobalMatrimony() {
   const [profiles, setProfiles] = useState([])
   const [loading, setLoading] = useState(true)
@@ -30,14 +37,27 @@ export default function GlobalMatrimony() {
   const [search, setSearch] = useState('')
   const [genderFilter, setGenderFilter] = useState('all')
   const [payFilter, setPayFilter] = useState('all')
-  const [selectedProfile, setSelectedProfile] = useState(null)
 
-  useEffect(() => {
+  // Modal states
+  const [viewProfile, setViewProfile] = useState(null)
+  const [editProfile, setEditProfile] = useState(null)
+  const [deleteTarget, setDeleteTarget] = useState(null)
+
+  // Edit form
+  const [editForm, setEditForm] = useState({ status: '', paymentStatus: '' })
+  const [saving, setSaving] = useState(false)
+  const [deleting, setDeleting] = useState(false)
+  const [saveError, setSaveError] = useState('')
+
+  useEffect(() => { fetchProfiles() }, [])
+
+  function fetchProfiles() {
+    setLoading(true)
     client.get('/admin/matrimony-profiles')
       .then(res => setProfiles(res.data.data || []))
       .catch(err => setError(err.response?.data?.message || 'Failed to load profiles'))
       .finally(() => setLoading(false))
-  }, [])
+  }
 
   const filtered = profiles.filter(p => {
     const fullName = `${p.firstName} ${p.lastName}`.toLowerCase()
@@ -54,13 +74,49 @@ export default function GlobalMatrimony() {
     { label: 'Male Profiles', value: profiles.filter(p => p.profileData?.gender === 'Male').length, icon: '👨', color: 'var(--info)', bg: 'var(--info-bg)' },
   ]
 
+  // ── Open Edit ─────────────────────────────────────────────────────
+  function openEdit(p) {
+    setEditForm({ status: p.status || 'active', paymentStatus: p.paymentStatus || 'unpaid' })
+    setSaveError('')
+    setEditProfile(p)
+  }
+
+  // ── Save Edit ─────────────────────────────────────────────────────
+  async function handleSaveEdit() {
+    setSaving(true); setSaveError('')
+    try {
+      const res = await client.patch(`/admin/matrimony-profiles/${editProfile.id}`, editForm)
+      const updated = res.data.data
+      setProfiles(prev => prev.map(p => p.id === updated.id ? { ...p, ...updated } : p))
+      setEditProfile(null)
+    } catch (err) {
+      setSaveError(err.response?.data?.message || 'Failed to update.')
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  // ── Delete ────────────────────────────────────────────────────────
+  async function handleDelete() {
+    setDeleting(true)
+    try {
+      await client.delete(`/admin/matrimony-profiles/${deleteTarget.id}`)
+      setProfiles(prev => prev.filter(p => p.id !== deleteTarget.id))
+      setDeleteTarget(null)
+    } catch (err) {
+      alert(err.response?.data?.message || 'Delete failed.')
+    } finally {
+      setDeleting(false)
+    }
+  }
+
   return (
     <div>
       <div className="service-hero">
         <div className="service-hero-icon">💍</div>
         <div className="service-hero-text">
           <h1>Global Matrimony</h1>
-          <p>Manage matrimony profiles, matches, and member payments. View detailed profile information.</p>
+          <p>Manage matrimony profiles, matches, and member payments. View, edit, or remove profiles.</p>
         </div>
       </div>
 
@@ -95,12 +151,11 @@ export default function GlobalMatrimony() {
               <option value="paid">Paid</option>
               <option value="unpaid">Unpaid</option>
             </select>
+            <button className="btn btn-ghost btn-sm" onClick={fetchProfiles}>🔄 Refresh</button>
           </div>
         </div>
 
-        {error && (
-          <div style={{ padding: '20px', color: 'var(--danger)', fontSize: '0.9rem' }}>⚠️ {error}</div>
-        )}
+        {error && <div style={{ padding: '20px', color: 'var(--danger)', fontSize: '0.9rem' }}>⚠️ {error}</div>}
 
         {loading ? (
           <div style={{ padding: '60px', textAlign: 'center', color: 'var(--text-muted)' }}>⏳ Loading profiles…</div>
@@ -123,7 +178,7 @@ export default function GlobalMatrimony() {
                   <th>Payment</th>
                   <th>Status</th>
                   <th>Registered</th>
-                  <th></th>
+                  <th>Actions</th>
                 </tr>
               </thead>
               <tbody>
@@ -148,21 +203,39 @@ export default function GlobalMatrimony() {
                     <td style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>{calcAge(p.profileData?.dob)}</td>
                     <td style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>{p.profileData?.education || '—'}</td>
                     <td style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>{p.profileData?.profession || '—'}</td>
-                    <td>
-                      <span className={`badge ${STATUS_COLORS[p.paymentStatus] || 'badge-default'}`}>
-                        {p.paymentStatus || 'unknown'}
-                      </span>
-                    </td>
-                    <td>
-                      <span className={`badge ${STATUS_COLORS[p.status] || 'badge-default'}`}>
-                        {p.status || 'unknown'}
-                      </span>
-                    </td>
+                    <td><span className={`badge ${STATUS_COLORS[p.paymentStatus] || 'badge-default'}`}>{p.paymentStatus || 'unknown'}</span></td>
+                    <td><span className={`badge ${STATUS_COLORS[p.status] || 'badge-default'}`}>{p.status || 'unknown'}</span></td>
                     <td style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>{timeAgo(p.createdAt)}</td>
                     <td>
-                      <button className="btn btn-ghost btn-sm" onClick={() => setSelectedProfile(p)}>
-                        View
-                      </button>
+                      <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
+                        {/* VIEW */}
+                        <button
+                          className="btn btn-ghost btn-sm"
+                          onClick={() => setViewProfile(p)}
+                          title="View Profile"
+                          style={{ padding: '4px 10px', fontSize: '0.78rem' }}
+                        >
+                          👁 View
+                        </button>
+                        {/* EDIT */}
+                        <button
+                          className="btn btn-ghost btn-sm"
+                          onClick={() => openEdit(p)}
+                          title="Edit Profile"
+                          style={{ padding: '4px 10px', fontSize: '0.78rem', color: 'var(--brand-primary)' }}
+                        >
+                          ✏️ Edit
+                        </button>
+                        {/* DELETE */}
+                        <button
+                          className="btn btn-ghost btn-sm"
+                          onClick={() => setDeleteTarget(p)}
+                          title="Delete Profile"
+                          style={{ padding: '4px 10px', fontSize: '0.78rem', color: 'var(--danger)' }}
+                        >
+                          🗑 Delete
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 ))}
@@ -172,45 +245,153 @@ export default function GlobalMatrimony() {
         )}
       </div>
 
-      {/* Profile Detail Modal */}
-      {selectedProfile && (
-        <div className="modal-overlay" onClick={() => setSelectedProfile(null)}>
-          <div className="modal" style={{ width: '540px' }} onClick={e => e.stopPropagation()}>
+      {/* ── VIEW MODAL ─────────────────────────────────────────────── */}
+      {viewProfile && (
+        <div className="modal-overlay" onClick={() => setViewProfile(null)}>
+          <div className="modal" style={{ width: '560px', maxHeight: '85vh', overflowY: 'auto' }} onClick={e => e.stopPropagation()}>
             <div className="modal-header">
-              <div className="modal-title">Profile Details</div>
-              <button className="modal-close" onClick={() => setSelectedProfile(null)}>✕</button>
+              <div className="modal-title">👁 Profile Details</div>
+              <button className="modal-close" onClick={() => setViewProfile(null)}>✕</button>
             </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '20px', padding: '16px', background: 'rgba(255,255,255,0.03)', borderRadius: '12px' }}>
-              {selectedProfile.profilePhoto ? (
-                <img src={`http://localhost:5000${selectedProfile.profilePhoto}`} alt="" style={{ width: '64px', height: '64px', borderRadius: '50%', objectFit: 'cover' }} />
+
+            {/* Top card */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '16px', padding: '16px', background: 'rgba(255,255,255,0.03)', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.06)' }}>
+              {viewProfile.profilePhoto ? (
+                <img src={`http://localhost:5000${viewProfile.profilePhoto}`} alt="" style={{ width: '64px', height: '64px', borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }} />
               ) : (
-                <div className="avatar avatar-lg" style={{ background: 'rgba(236,72,153,0.2)', color: '#ec4899' }}>
-                  {selectedProfile.firstName?.[0]}{selectedProfile.lastName?.[0]}
+                <div className="avatar avatar-lg" style={{ background: 'rgba(236,72,153,0.2)', color: '#ec4899', flexShrink: 0 }}>
+                  {viewProfile.firstName?.[0]}{viewProfile.lastName?.[0]}
                 </div>
               )}
-              <div>
-                <div style={{ fontFamily: 'Outfit, sans-serif', fontWeight: 700, fontSize: '1.2rem' }}>{selectedProfile.firstName} {selectedProfile.lastName}</div>
-                <div style={{ fontSize: '0.82rem', color: 'var(--text-secondary)' }}>{selectedProfile.email}</div>
-                <div style={{ fontSize: '0.82rem', color: 'var(--text-muted)', marginTop: '2px' }}>{selectedProfile.phone}</div>
+              <div style={{ flex: 1 }}>
+                <div style={{ fontFamily: 'Outfit, sans-serif', fontWeight: 700, fontSize: '1.15rem' }}>{viewProfile.firstName} {viewProfile.lastName}</div>
+                <div style={{ fontSize: '0.82rem', color: 'var(--text-secondary)' }}>{viewProfile.email}</div>
+                <div style={{ fontSize: '0.82rem', color: 'var(--text-muted)', marginTop: '2px' }}>{viewProfile.phone}</div>
               </div>
-              <div style={{ marginLeft: 'auto' }}>
-                <span className={`badge ${STATUS_COLORS[selectedProfile.paymentStatus] || 'badge-default'}`}>{selectedProfile.paymentStatus}</span>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', alignItems: 'flex-end' }}>
+                <span className={`badge ${STATUS_COLORS[viewProfile.paymentStatus] || 'badge-default'}`}>{viewProfile.paymentStatus}</span>
+                <span className={`badge ${STATUS_COLORS[viewProfile.status] || 'badge-default'}`}>{viewProfile.status}</span>
               </div>
             </div>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
-              {Object.entries(selectedProfile.profileData || {}).map(([key, val]) => (
-                <div key={key} style={{ padding: '10px 14px', background: 'rgba(255,255,255,0.025)', borderRadius: '8px' }}>
-                  <div style={{ fontSize: '0.68rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.06em', color: 'var(--text-muted)', marginBottom: '4px' }}>{key}</div>
-                  <div style={{ fontSize: '0.875rem', color: 'var(--text-primary)', fontWeight: 500 }}>{val || '—'}</div>
+
+            {/* Basic info */}
+            <div style={{ marginBottom: '10px', fontSize: '0.7rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--text-muted)' }}>Basic Info</div>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', marginBottom: '16px' }}>
+              <Field label="Gender" value={viewProfile.profileData?.gender} />
+              <Field label="Age" value={calcAge(viewProfile.profileData?.dob)} />
+              <Field label="Date of Birth" value={viewProfile.profileData?.dob} />
+              <Field label="Marital Status" value={viewProfile.profileData?.maritalStatus} />
+            </div>
+
+            {/* Bio data */}
+            <div style={{ marginBottom: '10px', fontSize: '0.7rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--text-muted)' }}>Bio Data</div>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', marginBottom: '16px' }}>
+              <Field label="Religion" value={viewProfile.profileData?.religion} />
+              <Field label="Caste" value={viewProfile.profileData?.caste} />
+              <Field label="Mother Tongue" value={viewProfile.profileData?.motherTongue} />
+              <Field label="Height" value={viewProfile.profileData?.height} />
+              <Field label="Education" value={viewProfile.profileData?.education} />
+              <Field label="Profession" value={viewProfile.profileData?.profession} />
+              <Field label="Annual Income" value={viewProfile.profileData?.annualIncome} />
+              <Field label="City" value={viewProfile.profileData?.city} />
+              <Field label="State" value={viewProfile.profileData?.state} />
+              <Field label="Profile For" value={viewProfile.profileData?.profileFor} />
+            </div>
+
+            {viewProfile.profileData?.about && (
+              <>
+                <div style={{ marginBottom: '10px', fontSize: '0.7rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--text-muted)' }}>About</div>
+                <div style={{ padding: '12px 14px', background: 'rgba(255,255,255,0.03)', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.06)', fontSize: '0.875rem', color: 'var(--text-secondary)', lineHeight: 1.6, marginBottom: '16px' }}>
+                  {viewProfile.profileData.about}
                 </div>
-              ))}
-            </div>
-            {selectedProfile.transactionId && (
-              <div style={{ marginTop: '14px', padding: '10px 14px', background: 'rgba(255,255,255,0.025)', borderRadius: '8px' }}>
-                <div style={{ fontSize: '0.68rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.06em', color: 'var(--text-muted)', marginBottom: '4px' }}>Transaction ID</div>
-                <div style={{ fontSize: '0.82rem', fontFamily: 'monospace', color: 'var(--brand-primary)' }}>{selectedProfile.transactionId}</div>
-              </div>
+              </>
             )}
+
+            {viewProfile.transactionId && (
+              <Field label="Transaction ID" value={viewProfile.transactionId} />
+            )}
+
+            <div style={{ marginTop: '16px', display: 'flex', justifyContent: 'flex-end', gap: '8px' }}>
+              <button className="btn btn-ghost btn-sm" onClick={() => { setViewProfile(null); openEdit(viewProfile); }}>✏️ Edit</button>
+              <button className="btn btn-ghost btn-sm" onClick={() => setViewProfile(null)}>Close</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── EDIT MODAL ─────────────────────────────────────────────── */}
+      {editProfile && (
+        <div className="modal-overlay" onClick={() => setEditProfile(null)}>
+          <div className="modal" style={{ width: '420px' }} onClick={e => e.stopPropagation()}>
+            <div className="modal-header">
+              <div className="modal-title">✏️ Edit Profile — {editProfile.firstName} {editProfile.lastName}</div>
+              <button className="modal-close" onClick={() => setEditProfile(null)}>✕</button>
+            </div>
+
+            {saveError && <div style={{ background: 'rgba(239,68,68,0.1)', color: 'var(--danger)', padding: '10px 14px', borderRadius: '8px', fontSize: '0.82rem', marginBottom: '14px', border: '1px solid rgba(239,68,68,0.2)' }}>⚠️ {saveError}</div>}
+
+            <div style={{ display: 'grid', gap: '14px' }}>
+              <div>
+                <label style={{ fontSize: '0.7rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--text-muted)', display: 'block', marginBottom: '6px' }}>Profile Status</label>
+                <select className="input" value={editForm.status} onChange={e => setEditForm(f => ({ ...f, status: e.target.value }))}>
+                  <option value="active">Active</option>
+                  <option value="inactive">Inactive</option>
+                  <option value="pending">Pending</option>
+                </select>
+              </div>
+              <div>
+                <label style={{ fontSize: '0.7rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--text-muted)', display: 'block', marginBottom: '6px' }}>Payment Status</label>
+                <select className="input" value={editForm.paymentStatus} onChange={e => setEditForm(f => ({ ...f, paymentStatus: e.target.value }))}>
+                  <option value="paid">Paid</option>
+                  <option value="unpaid">Unpaid</option>
+                </select>
+              </div>
+            </div>
+
+            <div style={{ display: 'flex', gap: '10px', marginTop: '20px', justifyContent: 'flex-end' }}>
+              <button className="btn btn-ghost btn-sm" onClick={() => setEditProfile(null)}>Cancel</button>
+              <button
+                className="btn btn-sm"
+                disabled={saving}
+                onClick={handleSaveEdit}
+                style={{ background: 'var(--brand-primary)', color: '#000', fontWeight: 700, borderRadius: '8px', padding: '6px 18px', cursor: 'pointer', fontFamily: 'Inter, sans-serif', opacity: saving ? 0.7 : 1 }}
+              >
+                {saving ? '⏳ Saving…' : '✅ Save Changes'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── DELETE CONFIRM MODAL ───────────────────────────────────── */}
+      {deleteTarget && (
+        <div className="modal-overlay" onClick={() => setDeleteTarget(null)}>
+          <div className="modal" style={{ width: '380px' }} onClick={e => e.stopPropagation()}>
+            <div className="modal-header">
+              <div className="modal-title" style={{ color: 'var(--danger)' }}>🗑 Delete Profile</div>
+              <button className="modal-close" onClick={() => setDeleteTarget(null)}>✕</button>
+            </div>
+            <div style={{ textAlign: 'center', padding: '10px 0 20px' }}>
+              <div style={{ fontSize: '3rem', marginBottom: '12px' }}>⚠️</div>
+              <p style={{ fontSize: '0.9rem', color: 'var(--text-secondary)', marginBottom: '6px' }}>
+                Are you sure you want to permanently delete
+              </p>
+              <p style={{ fontWeight: 700, fontSize: '1rem', color: 'var(--text-primary)', marginBottom: '4px' }}>
+                {deleteTarget.firstName} {deleteTarget.lastName}
+              </p>
+              <p style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>{deleteTarget.email}</p>
+              <p style={{ fontSize: '0.8rem', color: 'var(--danger)', marginTop: '14px', fontWeight: 600 }}>This action cannot be undone.</p>
+            </div>
+            <div style={{ display: 'flex', gap: '10px', justifyContent: 'center' }}>
+              <button className="btn btn-ghost btn-sm" onClick={() => setDeleteTarget(null)}>Cancel</button>
+              <button
+                disabled={deleting}
+                onClick={handleDelete}
+                style={{ background: 'var(--danger)', color: '#fff', fontWeight: 700, border: 'none', borderRadius: '8px', padding: '8px 20px', cursor: 'pointer', fontFamily: 'Inter, sans-serif', opacity: deleting ? 0.7 : 1 }}
+              >
+                {deleting ? '⏳ Deleting…' : '🗑 Yes, Delete'}
+              </button>
+            </div>
           </div>
         </div>
       )}

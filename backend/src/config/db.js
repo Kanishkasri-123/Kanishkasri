@@ -48,6 +48,57 @@ async function initDB() {
         status VARCHAR(50) DEFAULT 'new',
         "createdAt" TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       );
+
+      CREATE TABLE IF NOT EXISTS real_estate_listings (
+        id VARCHAR(255) PRIMARY KEY,
+        "sellerId" VARCHAR(255),
+        title VARCHAR(255) NOT NULL,
+        price VARCHAR(100),
+        location VARCHAR(255),
+        category VARCHAR(100),
+        type VARCHAR(100),
+        size VARCHAR(100),
+        description TEXT,
+        contact VARCHAR(100),
+        seller VARCHAR(255),
+        img TEXT,
+        "documentName" VARCHAR(255),
+        document TEXT,
+        status VARCHAR(50) DEFAULT 'available',
+        date VARCHAR(255),
+        "createdAt" TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      );
+
+      CREATE TABLE IF NOT EXISTS abroad_enquiries (
+        id VARCHAR(255) PRIMARY KEY,
+        "firstName" VARCHAR(100),
+        "lastName" VARCHAR(100),
+        email VARCHAR(255) NOT NULL,
+        phone VARCHAR(50) NOT NULL,
+        country VARCHAR(255),
+        "preferredDate" VARCHAR(100),
+        "preferredTime" VARCHAR(100),
+        message TEXT,
+        status VARCHAR(50) DEFAULT 'new',
+        "createdAt" TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      );
+
+      CREATE TABLE IF NOT EXISTS groceries_products (
+        id VARCHAR(255) PRIMARY KEY,
+        name VARCHAR(255) NOT NULL,
+        brand VARCHAR(255),
+        category VARCHAR(100),
+        mrp DECIMAL(10, 2),
+        selling_price DECIMAL(10, 2),
+        discount_percent DECIMAL(5, 2),
+        weight VARCHAR(50),
+        stock INTEGER DEFAULT 0,
+        description TEXT,
+        image_url TEXT,
+        status VARCHAR(50) DEFAULT 'in-stock',
+        tags TEXT,
+        "createdAt" TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      );
     `);
     
     // Create default admin user securely

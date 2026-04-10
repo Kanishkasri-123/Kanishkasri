@@ -144,79 +144,79 @@ const ITServices = () => {
                                         initial={{ opacity: 0, y: 20 }}
                                         whileInView={{ opacity: 1, y: 0 }}
                                         viewport={{ once: true }}
-                                        className={`bg-white rounded-[3rem] overflow-hidden shadow-xl border border-gray-100 flex flex-col ${idx % 2 === 0 ? 'md:flex-row' : 'md:flex-row-reverse'} items-stretch min-h-[450px] transition-all duration-500 hover:shadow-2xl`}
+                                        className={`bg-white rounded-2xl overflow-hidden shadow-md border border-gray-100 flex flex-col ${idx % 2 === 0 ? 'md:flex-row' : 'md:flex-row-reverse'} items-stretch min-h-[320px] transition-all duration-500 hover:shadow-xl`}
                                     >
                                         {/* Image Side */}
-                                        <div className="md:w-5/12 relative min-h-[300px] md:min-h-full overflow-hidden group">
+                                        <div className="md:w-5/12 relative min-h-[200px] md:min-h-full overflow-hidden group">
                                             <img src={course.image} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-1000" alt={course.title} />
-                                            <div className="absolute top-6 left-6">
-                                                <span className="bg-white/95 backdrop-blur-md px-4 py-2 rounded-xl text-xs font-bold text-blue-700 shadow-xl border border-white/50">{course.level}</span>
+                                            <div className="absolute top-3 left-3">
+                                                <span className="bg-white/95 backdrop-blur-md px-3 py-1 rounded-lg text-[11px] font-bold text-blue-700 shadow-md border border-white/50">{course.level}</span>
                                             </div>
                                         </div>
 
                                         {/* Content Side */}
-                                        <div className="md:w-7/12 p-8 md:p-14 flex flex-col justify-center">
-                                            <div className="flex items-center justify-between mb-4">
-                                                <div className="flex items-center gap-2 text-amber-500 font-bold">
-                                                    <Star size={18} fill="currentColor" /> {course.rating} <span className="text-gray-400 font-medium ml-1">({course.reviews} Students)</span>
+                                        <div className="md:w-7/12 p-5 md:p-8 flex flex-col justify-center">
+                                            <div className="flex items-center justify-between mb-2">
+                                                <div className="flex items-center gap-1.5 text-amber-500 font-bold text-sm">
+                                                    <Star size={14} fill="currentColor" /> {course.rating} <span className="text-gray-400 font-medium ml-1 text-xs">({course.reviews} Students)</span>
                                                 </div>
-                                                <div className="flex items-center gap-2 text-gray-500 font-bold text-sm">
-                                                    <Clock size={16} /> {course.duration}
+                                                <div className="flex items-center gap-1.5 text-gray-400 font-semibold text-xs">
+                                                    <Clock size={13} /> {course.duration}
                                                 </div>
                                             </div>
 
-                                            <h3 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6 font-display leading-tight">{course.title}</h3>
+                                            <h3 className="text-xl md:text-2xl font-bold text-gray-900 mb-3 font-display leading-tight">{course.title}</h3>
 
-                                            <div className="flex flex-wrap gap-2 mb-6">
+                                            <div className="flex flex-wrap gap-1.5 mb-3">
                                                 {course.tech.map((t, i) => (
-                                                    <span key={i} className="px-4 py-1.5 bg-blue-50 text-blue-600 text-[11px] font-bold rounded-full border border-blue-100 shadow-sm">{t}</span>
+                                                    <span key={i} className="px-3 py-1 bg-blue-50 text-blue-600 text-[10px] font-bold rounded-full border border-blue-100">{t}</span>
                                                 ))}
                                             </div>
 
                                             {/* DESCRIPTIVE ABOUT PARAGRAPH */}
-                                            <div className="mb-8">
-                                                <div className="flex items-center gap-2 text-[10px] font-bold text-blue-600 uppercase tracking-widest mb-3">
-                                                    <Info size={12} /> Course Overview
+                                            <div className="mb-4">
+                                                <div className="flex items-center gap-1.5 text-[10px] font-bold text-blue-600 uppercase tracking-widest mb-1.5">
+                                                    <Info size={11} /> Course Overview
                                                 </div>
-                                                <p className="text-gray-600 leading-relaxed text-[15px] font-medium">
+                                                <p className="text-gray-500 leading-relaxed text-xs font-medium line-clamp-3">
                                                     {ext.about}
                                                 </p>
                                             </div>
 
                                             {/* Key Info Grid */}
-                                            <div className="grid grid-cols-2 gap-6 mb-8 border-y border-gray-50 py-6">
-                                                <div className="flex items-center gap-3">
-                                                    <div className="w-10 h-10 rounded-xl bg-orange-50 text-orange-600 flex items-center justify-center flex-shrink-0">
-                                                        <TrendingUp size={20} />
+                                            <div className="grid grid-cols-2 gap-3 mb-4 border-y border-gray-100 py-3">
+                                                <div className="flex items-center gap-2">
+                                                    <div className="w-8 h-8 rounded-lg bg-orange-50 text-orange-500 flex items-center justify-center flex-shrink-0">
+                                                        <TrendingUp size={15} />
                                                     </div>
                                                     <div>
-                                                        <div className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Est. Salary</div>
-                                                        <div className="font-bold text-gray-900">{ext.salary}</div>
+                                                        <div className="text-[9px] font-bold text-gray-400 uppercase tracking-widest">Est. Salary</div>
+                                                        <div className="font-bold text-gray-900 text-sm">{ext.salary}</div>
                                                     </div>
                                                 </div>
-                                                <div className="flex items-center gap-3">
-                                                    <div className="w-10 h-10 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center flex-shrink-0">
-                                                        <Laptop size={20} />
+                                                <div className="flex items-center gap-2">
+                                                    <div className="w-8 h-8 rounded-lg bg-purple-50 text-purple-500 flex items-center justify-center flex-shrink-0">
+                                                        <Laptop size={15} />
                                                     </div>
                                                     <div>
-                                                        <div className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Future Role</div>
-                                                        <div className="font-bold text-gray-900">{ext.role}</div>
+                                                        <div className="text-[9px] font-bold text-gray-400 uppercase tracking-widest">Future Role</div>
+                                                        <div className="font-bold text-gray-900 text-sm">{ext.role}</div>
                                                     </div>
                                                 </div>
                                             </div>
 
-                                            <div className="flex flex-col sm:flex-row gap-4">
+                                            <div className="flex flex-col sm:flex-row gap-2">
                                                 <button
                                                     onClick={() => toggleDetails(course.id)}
-                                                    className={`px-8 py-4 rounded-2xl font-bold transition-all flex items-center justify-center gap-2 border-2 ${expandedCourse === course.id ? 'bg-gray-100 border-gray-100' : 'bg-white border-blue-600 text-blue-600 hover:bg-blue-50 shadow-md shadow-blue-50'}`}
+                                                    className={`px-5 py-2.5 rounded-xl font-bold text-sm transition-all flex items-center justify-center gap-1.5 border-2 ${expandedCourse === course.id ? 'bg-gray-100 border-gray-200 text-gray-600' : 'bg-white border-blue-600 text-blue-600 hover:bg-blue-50'}`}
                                                 >
-                                                    {expandedCourse === course.id ? 'Hide Details' : 'View Syllabus'} <BookOpen size={18} />
+                                                    {expandedCourse === course.id ? 'Hide Details' : 'View Syllabus'} <BookOpen size={14} />
                                                 </button>
                                                 <button
                                                     onClick={openEnrollment}
-                                                    className="px-8 py-4 bg-blue-600 text-white rounded-2xl font-bold hover:bg-gray-900 transition-all shadow-xl shadow-blue-100 flex items-center justify-center gap-2"
+                                                    className="px-5 py-2.5 bg-blue-600 text-white rounded-xl font-bold text-sm hover:bg-gray-900 transition-all shadow-lg shadow-blue-100 flex items-center justify-center gap-1.5"
                                                 >
-                                                    Apply Now <ArrowRight size={18} />
+                                                    Apply Now <ArrowRight size={14} />
                                                 </button>
                                             </div>
 
@@ -229,33 +229,33 @@ const ITServices = () => {
                                                         exit={{ height: 0, opacity: 0 }}
                                                         className="overflow-hidden"
                                                     >
-                                                        <div className="mt-10 pt-8 border-t border-gray-100 grid grid-cols-1 gap-8">
+                                                        <div className="mt-5 pt-5 border-t border-gray-100 grid grid-cols-1 gap-4">
                                                             <div>
-                                                                <div className="text-sm font-bold text-blue-700 uppercase tracking-widest mb-6 flex items-center gap-2">
-                                                                    <Layers size={16} /> Technical Curriculum
+                                                                <div className="text-xs font-bold text-blue-700 uppercase tracking-widest mb-3 flex items-center gap-1.5">
+                                                                    <Layers size={13} /> Technical Curriculum
                                                                 </div>
-                                                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                                                                     {ext.syllabus.map((item, i) => (
-                                                                        <div key={i} className="p-4 bg-slate-50 rounded-xl border border-slate-100 flex items-center gap-3 text-sm text-gray-700 font-bold group/skill hover:bg-white hover:border-blue-200 transition-all">
-                                                                            <ShieldCheck size={16} className="text-blue-500 group-hover/skill:scale-125 transition-transform" /> {item}
+                                                                        <div key={i} className="p-3 bg-slate-50 rounded-xl border border-slate-100 flex items-center gap-2 text-xs text-gray-700 font-bold group/skill hover:bg-white hover:border-blue-200 transition-all">
+                                                                            <ShieldCheck size={13} className="text-blue-500 group-hover/skill:scale-125 transition-transform" /> {item}
                                                                         </div>
                                                                     ))}
                                                                 </div>
                                                             </div>
-                                                            <div className="bg-gradient-to-br from-gray-900 to-slate-800 p-8 rounded-[2.5rem] text-white">
-                                                                <div className="flex items-center gap-3 mb-6">
-                                                                    <Zap size={20} className="text-amber-400" />
-                                                                    <div className="font-bold text-lg">Value Proposition</div>
+                                                            <div className="bg-gradient-to-br from-gray-900 to-slate-800 p-5 rounded-2xl text-white">
+                                                                <div className="flex items-center gap-2 mb-3">
+                                                                    <Zap size={15} className="text-amber-400" />
+                                                                    <div className="font-bold text-sm">Value Proposition</div>
                                                                 </div>
-                                                                <ul className="space-y-4">
+                                                                <ul className="space-y-2">
                                                                     {[
                                                                         "200+ hours of live architecture training",
                                                                         "One-to-one mentorship with MNC Leads",
                                                                         "Weekly mock interviews & resume building",
                                                                         "Lifetime access to our recruitment portal"
                                                                     ].map((benefit, i) => (
-                                                                        <li key={i} className="text-sm text-gray-300 flex items-start gap-3">
-                                                                            <CheckCircle size={16} className="text-emerald-400 mt-0.5 flex-shrink-0" /> {benefit}
+                                                                        <li key={i} className="text-xs text-gray-300 flex items-start gap-2">
+                                                                            <CheckCircle size={13} className="text-emerald-400 mt-0.5 flex-shrink-0" /> {benefit}
                                                                         </li>
                                                                     ))}
                                                                 </ul>
@@ -360,16 +360,16 @@ const ITServices = () => {
                             animate={{ scale: 1, opacity: 1, y: 0 }}
                             exit={{ scale: 0.9, opacity: 0, y: 20 }}
                             onClick={e => e.stopPropagation()}
-                            className="bg-white w-full max-w-2xl rounded-[3rem] shadow-2xl relative overflow-hidden"
+                            className="bg-white w-full max-w-lg rounded-3xl shadow-2xl relative overflow-hidden"
                         >
                             <button
                                 onClick={closeEnrollment}
-                                className="absolute top-8 right-8 w-10 h-10 rounded-full bg-slate-50 text-gray-400 flex items-center justify-center hover:bg-red-50 hover:text-red-500 transition-colors z-20"
+                                className="absolute top-4 right-4 w-8 h-8 rounded-full bg-slate-100 text-gray-400 flex items-center justify-center hover:bg-red-50 hover:text-red-500 transition-colors z-20"
                             >
-                                <X size={20} />
+                                <X size={16} />
                             </button>
 
-                            <div className="p-8 md:p-12">
+                            <div className="p-6 md:p-8">
                                 <EnrollmentForm onClose={closeEnrollment} />
                             </div>
                         </motion.div>
@@ -418,51 +418,51 @@ const EnrollmentForm = ({ onClose }) => {
 
     return (
         <div className="relative">
-            <div className="mb-10">
-                <h3 className="text-3xl font-bold text-gray-900 font-display mb-2">Apply for Selection</h3>
-                <p className="text-gray-500 text-sm font-medium">Join the next batch of elite tech professionals.</p>
+            <div className="mb-5">
+                <h3 className="text-xl font-bold text-gray-900 font-display mb-1">Apply for Selection</h3>
+                <p className="text-gray-400 text-xs font-medium">Join the next batch of elite tech professionals.</p>
             </div>
 
-            {success && <div className="mb-8 p-6 rounded-2xl bg-emerald-50 border border-emerald-100 text-emerald-700 font-bold text-center animate-pulse shadow-sm">{success}</div>}
-            {error && <div className="mb-8 p-6 rounded-2xl bg-red-50 border border-red-100 text-red-600 font-bold text-center shadow-sm">{error}</div>}
+            {success && <div className="mb-4 p-3 rounded-xl bg-emerald-50 border border-emerald-100 text-emerald-700 font-semibold text-sm text-center animate-pulse">{success}</div>}
+            {error && <div className="mb-4 p-3 rounded-xl bg-red-50 border border-red-100 text-red-600 font-semibold text-sm text-center">{error}</div>}
 
-            <form onSubmit={handleSubmit} className="space-y-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm">
-                    <div className="space-y-2">
+            <form onSubmit={handleSubmit} className="space-y-3">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
+                    <div className="space-y-1">
                         <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-1">Full Name</label>
-                        <input type="text" name="name" required value={form.name} onChange={handleChange} placeholder="Enter your name" className="w-full px-5 py-4 bg-slate-50 border border-slate-100 rounded-2xl outline-none focus:ring-2 focus:ring-blue-600 focus:bg-white transition-all shadow-sm font-medium" />
+                        <input type="text" name="name" required value={form.name} onChange={handleChange} placeholder="Enter your name" className="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all text-sm font-medium" />
                     </div>
-                    <div className="space-y-2">
+                    <div className="space-y-1">
                         <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-1">Email</label>
-                        <input type="email" name="email" required value={form.email} onChange={handleChange} placeholder="your@email.com" className="w-full px-5 py-4 bg-slate-50 border border-slate-100 rounded-2xl outline-none focus:ring-2 focus:ring-blue-600 focus:bg-white transition-all shadow-sm font-medium" />
+                        <input type="email" name="email" required value={form.email} onChange={handleChange} placeholder="your@email.com" className="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all text-sm font-medium" />
                     </div>
-                    <div className="space-y-2">
+                    <div className="space-y-1">
                         <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-1">Phone</label>
-                        <input type="tel" name="phone" required value={form.phone} onChange={handleChange} placeholder="+91 00000 00000" className="w-full px-5 py-4 bg-slate-50 border border-slate-100 rounded-2xl outline-none focus:ring-2 focus:ring-blue-600 focus:bg-white transition-all shadow-sm font-medium" />
+                        <input type="tel" name="phone" required value={form.phone} onChange={handleChange} placeholder="+91 00000 00000" className="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all text-sm font-medium" />
                     </div>
-                    <div className="space-y-2">
+                    <div className="space-y-1">
                         <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-1">Course</label>
-                        <select name="course" required value={form.course} onChange={handleChange} className="w-full px-5 py-4 bg-slate-50 border border-slate-100 rounded-2xl outline-none focus:ring-2 focus:ring-blue-600 focus:bg-white transition-all shadow-sm font-medium appearance-none">
+                        <select name="course" required value={form.course} onChange={handleChange} className="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all text-sm font-medium appearance-none">
                             <option value="">Select Course</option>
                             {COURSE_OPTIONS.map(c => <option key={c} value={c}>{c}</option>)}
                         </select>
                     </div>
                 </div>
-                <div className="space-y-2">
-                    <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-1">Professional Experience</label>
-                    <select name="experience" value={form.experience} onChange={handleChange} className="w-full px-5 py-4 bg-slate-50 border border-slate-100 rounded-2xl outline-none focus:ring-2 focus:ring-blue-600 focus:bg-white transition-all shadow-sm font-medium appearance-none">
+                <div className="space-y-1">
+                    <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-1">Experience Level</label>
+                    <select name="experience" value={form.experience} onChange={handleChange} className="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all text-sm font-medium appearance-none">
                         <option value="">Choose Level</option>
                         <option value="Beginner">Student / New Graduate</option>
                         <option value="Intermediate">1-3 Years Experience</option>
                         <option value="Advanced">3+ Years Experience (Senior Role)</option>
                     </select>
                 </div>
-                <div className="space-y-2">
+                <div className="space-y-1">
                     <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-1">Your Goals</label>
-                    <textarea name="message" value={form.message} onChange={handleChange} rows={2} placeholder="What do you want to achieve with this course?" className="w-full px-5 py-4 bg-slate-50 border border-slate-100 rounded-2xl outline-none focus:ring-2 focus:ring-blue-600 focus:bg-white transition-all shadow-sm resize-none font-medium" />
+                    <textarea name="message" value={form.message} onChange={handleChange} rows={2} placeholder="What do you want to achieve with this course?" className="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all text-sm resize-none font-medium" />
                 </div>
-                <button type="submit" disabled={loading} className="w-full py-5 bg-blue-600 text-white font-bold rounded-2xl shadow-xl shadow-blue-100 hover:scale-[1.01] active:scale-95 transition-all text-lg mt-4">
-                    {loading ? 'Submitting Application...' : 'Send Selection Form'}
+                <button type="submit" disabled={loading} className="w-full py-3 bg-blue-600 text-white font-bold rounded-xl shadow-lg shadow-blue-100 hover:bg-blue-700 active:scale-95 transition-all text-sm mt-1">
+                    {loading ? 'Submitting...' : 'Send Application'}
                 </button>
             </form>
         </div>

@@ -13,29 +13,35 @@ const authRoutes = require('./routes/auth.routes');
 const matrimonyRoutes = require('./routes/matrimony.routes');
 const adminRoutes = require('./routes/admin.routes');
 const itTrainingRoutes = require('./routes/it-training.routes');
+const realEstateRoutes = require('./routes/real-estate.routes');
+const abroadRoutes = require('./routes/abroad.routes');
+const groceriesRoutes = require('./routes/groceries.routes');
 const errorMiddleware = require('./middlewares/error.middleware');
 
 const app = express();
 
 // ── CORS ────────────────────────────────────────────────────────────────────
-// Allow requests from the Vite dev server and any production origin
-const allowedOrigins = [
-  'http://localhost:5173',  // Main app (Vite)
-  'http://localhost:5174',  // Admin panel (Vite)
-  'http://localhost:3000',
-  process.env.FRONTEND_URL, // Set in production
-  process.env.ADMIN_URL,    // Admin panel in production
-].filter(Boolean);
-
 app.use(
   cors({
     origin: (origin, callback) => {
-      // Allow requests with no origin (Postman, curl, mobile apps)
-      if (!origin || allowedOrigins.includes(origin)) {
-        callback(null, true);
-      } else {
-        callback(new Error(`CORS: origin ${origin} not allowed`));
+      // Very permissive for local development and specific URLs
+      if (
+        !origin || 
+        origin.startsWith('http://localhost') || 
+        origin.startsWith('http://127.0.0.1')
+      ) {
+        return callback(null, true);
       }
+      
+      const allowedOrigins = [
+        process.env.FRONTEND_URL,
+        process.env.ADMIN_URL,
+      ].filter(Boolean);
+
+      if (allowedOrigins.indexOf(origin) !== -1) {
+        return callback(null, true);
+      }
+      return callback(new Error(`CORS: origin ${origin} not allowed`));
     },
     credentials: true,
   })
@@ -58,6 +64,9 @@ app.use('/api/auth', authRoutes);
 app.use('/api/matrimony', matrimonyRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/it-training', itTrainingRoutes);
+app.use('/api/real-estate', realEstateRoutes);
+app.use('/api/abroad', abroadRoutes);
+app.use('/api/groceries', groceriesRoutes);
 
 // ── 404 Handler ───────────────────────────────────────────────────────────────
 app.use((_req, res) => {

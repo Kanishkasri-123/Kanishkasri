@@ -9,7 +9,7 @@ export const UIProvider = ({ children }) => {
     const [isLoginOpen, setIsLoginOpen] = useState(false);
     const [isProfileOpen, setIsProfileOpen] = useState(false);
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-    const [serviceModal, setServiceModal] = useState({ isOpen: false, type: null, title: '' });
+    const [serviceModal, setServiceModal] = useState({ isOpen: false, type: null, title: '', isLoginMode: false });
 
     // Toast state
     const [toast, setToast] = useState({ isOpen: false, message: '', type: 'success' });
@@ -87,8 +87,8 @@ export const UIProvider = ({ children }) => {
     const toggleMobileMenu = () => setIsMobileMenuOpen(prev => !prev);
     const closeMobileMenu = () => setIsMobileMenuOpen(false);
 
-    const openServiceModal = (type, title) => setServiceModal({ isOpen: true, type, title });
-    const closeServiceModal = () => setServiceModal({ isOpen: false, type: null, title: '' });
+    const openServiceModal = (type, title, isLoginMode = false) => setServiceModal({ isOpen: true, type, title, isLoginMode });
+    const closeServiceModal = () => setServiceModal({ isOpen: false, type: null, title: '', isLoginMode: false });
 
     const showToast = (message, type = 'success') => {
         setToast({ isOpen: true, message, type });

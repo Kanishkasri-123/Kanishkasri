@@ -1,8 +1,4 @@
-import React, { useState } from 'react'
-
-const APPLICATIONS = []
-
-const DESTINATIONS = []
+import React, { useState, useEffect } from 'react';
 
 const STATUS_COLORS = {
   new: 'badge-info',
@@ -21,24 +17,74 @@ const STATUS_LABELS = {
 }
 
 export default function AbroadConsultancy() {
-  const [tab, setTab] = useState('applications')
-  const [search, setSearch] = useState('')
-  const [statusFilter, setStatusFilter] = useState('all')
-  const [destFilter, setDestFilter] = useState('all')
+  const [applications, setApplications] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [updateLoading, setUpdateLoading] = useState(null);
 
-  const filtered = APPLICATIONS.filter(a => {
-    const matchSearch = a.name.toLowerCase().includes(search.toLowerCase()) || a.destination.toLowerCase().includes(search.toLowerCase())
-    const matchStatus = statusFilter === 'all' || a.status === statusFilter
-    const matchDest = destFilter === 'all' || a.destination === destFilter
-    return matchSearch && matchStatus && matchDest
-  })
+  const [tab, setTab] = useState('applications');
+  const [search, setSearch] = useState('');
+  const [statusFilter, setStatusFilter] = useState('all');
+  const [destFilter, setDestFilter] = useState('all');
+
+  useEffect(() => {
+    fetchApplications();
+  }, []);
+
+  const fetchApplications = async () => {
+    try {
+      const res = await fetch('http://localhost:5000/api/abroad/enquiries');
+      const data = await res.json();
+      if (data.success) {
+        setApplications(data.data);
+      }
+    } catch (err) {
+      console.error('Error fetching abroad enquiries:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const updateStatus = async (id, newStatus) => {
+    setUpdateLoading(id);
+    try {
+      const res = await fetch(`http://localhost:5000/api/abroad/enquiries/${id}/status`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: newStatus })
+      });
+      const data = await res.json();
+      if (data.success) {
+        setApplications(prev => prev.map(a => a.id === id ? { ...a, status: newStatus } : a));
+      }
+    } catch (err) {
+      console.error('Error updating status:', err);
+    } finally {
+      setUpdateLoading(null);
+    }
+  };
+
+  const filtered = applications.filter(a => {
+    const fullName = `${a.firstName || ''} ${a.lastName || ''}`.toLowerCase();
+    const matchSearch = fullName.includes(search.toLowerCase()) || (a.country && a.country.toLowerCase().includes(search.toLowerCase()));
+    const matchStatus = statusFilter === 'all' || a.status === statusFilter;
+    const matchDest = destFilter === 'all' || a.country === destFilter;
+    return matchSearch && matchStatus && matchDest;
+  });
+
+  const uniqueDestinations = [...new Set(applications.filter(a => a.country).map(a => a.country))];
+  const DESTINATIONS = uniqueDestinations.map(d => {
+      const appsForDest = applications.filter(a => a.country === d);
+      return { country: d, icon: '🌍', applications: appsForDest.length, approved: appsForDest.filter(a => a.status === 'approved').length };
+  });
 
   const stats = [
-    { label: 'Total Applications', value: APPLICATIONS.length, icon: '✈️', color: '#06b6d4', bg: 'rgba(6,182,212,0.1)' },
-    { label: 'In Progress', value: APPLICATIONS.filter(a => a.status === 'in-progress').length, icon: '⏳', color: 'var(--brand-primary)', bg: 'var(--warning-bg)' },
-    { label: 'Approved', value: APPLICATIONS.filter(a => a.status === 'approved').length, icon: '✅', color: 'var(--success)', bg: 'var(--success-bg)' },
-    { label: 'Destinations', value: DESTINATIONS.length, icon: '🌍', color: '#8b5cf6', bg: 'rgba(139,92,246,0.1)' },
-  ]
+    { label: 'Total Applications', value: applications.length, icon: '📋', color: '#06b6d4', bg: 'rgba(6,182,212,0.1)' },
+    { label: 'In Progress', value: applications.filter(a => a.status === 'in-progress').length, icon: '⏳', color: 'var(--warning)', bg: 'var(--warning-bg)' },
+    { label: 'Approved', value: applications.filter(a => a.status === 'approved').length, icon: '✅', color: 'var(--success)', bg: 'var(--success-bg)' },
+    { label: 'Destinations', value: uniqueDestinations.length, icon: '🌍', color: '#8b5cf6', bg: 'rgba(139,92,246,0.1)' },
+  ];
+
+  if (loading) return <div style={{ padding: '20px' }}>Loading...</div>;
 
   return (
     <div>
@@ -87,7 +133,7 @@ export default function AbroadConsultancy() {
               </select>
               <select className="input" style={{ width: '140px' }} value={destFilter} onChange={e => setDestFilter(e.target.value)}>
                 <option value="all">All Countries</option>
-                {[...new Set(APPLICATIONS.map(a => a.destination))].map(d => (
+                {uniqueDestinations.map(d => (
                   <option key={d} value={d}>{d}</option>
                 ))}
               </select>
@@ -98,11 +144,10 @@ export default function AbroadConsultancy() {
               <thead>
                 <tr>
                   <th>Applicant</th>
-                  <th>Destination</th>
-                  <th>Purpose</th>
-                  <th>Visa Type</th>
+                  <th>Destination/Date</th>
+                  <th>Contact</th>
                   <th>Status</th>
-                  <th>Applied</th>
+                  <th>Action</th>
                 </tr>
               </thead>
               <tbody>
@@ -110,18 +155,36 @@ export default function AbroadConsultancy() {
                   <tr key={a.id}>
                     <td>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                        <div className="avatar avatar-sm" style={{ background: 'rgba(6,182,212,0.2)', color: '#06b6d4' }}>{a.name[0]}</div>
+                        <div className="avatar avatar-sm" style={{ background: 'rgba(6,182,212,0.2)', color: '#06b6d4' }}>{(a.firstName || 'A')[0]}</div>
                         <div>
-                          <div style={{ fontWeight: 500, fontSize: '0.875rem' }}>{a.name}</div>
+                          <div style={{ fontWeight: 500, fontSize: '0.875rem' }}>{a.firstName} {a.lastName}</div>
                           <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>{a.email}</div>
                         </div>
                       </div>
                     </td>
-                    <td style={{ fontWeight: 500 }}>{a.destination}</td>
-                    <td style={{ fontSize: '0.82rem', color: 'var(--text-secondary)' }}>{a.purpose}</td>
-                    <td style={{ fontSize: '0.82rem', color: 'var(--text-secondary)' }}>{a.visa}</td>
+                    <td>
+                        <div style={{ fontWeight: 500 }}>{a.country || 'Not Set'}</div>
+                        <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>{a.preferredDate} {a.preferredTime}</div>
+                    </td>
+                    <td>
+                        <div style={{ fontSize: '0.82rem', color: 'var(--text-secondary)' }}>{a.phone}</div>
+                    </td>
                     <td><span className={`badge ${STATUS_COLORS[a.status]}`}>{STATUS_LABELS[a.status]}</span></td>
-                    <td style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>{a.date}</td>
+                    <td>
+                      <select 
+                        className="input" 
+                        style={{ width: '120px', padding: '4px 8px', fontSize: '0.8rem' }}
+                        value={a.status}
+                        onChange={e => updateStatus(a.id, e.target.value)}
+                        disabled={updateLoading === a.id}
+                      >
+                        <option value="new">New</option>
+                        <option value="in-progress">In Progress</option>
+                        <option value="documents-pending">Docs Pending</option>
+                        <option value="approved">Approved</option>
+                        <option value="rejected">Rejected</option>
+                      </select>
+                    </td>
                   </tr>
                 ))}
               </tbody>

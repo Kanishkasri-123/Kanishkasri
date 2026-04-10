@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { motion } from 'framer-motion';
-import { Plane, GraduationCap, Briefcase, FileCheck, ArrowRight, Sparkles, Globe, Award, BookOpen, Star, Search, CheckCircle } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Plane, GraduationCap, Briefcase, FileCheck, ArrowRight, Sparkles, Globe, Award, BookOpen, Star, Search, CheckCircle, X } from 'lucide-react';
 import { useUI } from '../../context/UIContext';
 
 const examsData = [
@@ -8,23 +8,23 @@ const examsData = [
         name: 'IELTS',
         fullName: 'International English Language Testing System',
         color: 'blue',
-        description: "The IELTS test is the world's most popular English language proficiency test for study, work, and migration. Accepted by over 11,000 organizations globally.",
+        description: "The IELTS test is the world's most popular English language proficiency test for study, work, and migration. Accepted by over 11,000 organizations globally including universities, employers, professional bodies, and immigration authorities.",
         whoShouldTake: 'Students planning to study in UK, Australia, Canada, New Zealand, or seeking immigration.',
         testFormat: [
-            'Listening (30 minutes): 4 recordings',
-            'Reading (60 minutes): 3 passages',
-            'Writing (60 minutes): 2 tasks',
-            'Speaking (11-14 minutes): Interview'
+            'Listening (30 mins): 40 questions',
+            'Reading (60 mins): 40 questions',
+            'Writing (60 mins): 2 tasks',
+            'Speaking (11-14 mins): Face-to-face interview'
         ],
         details: [
             'Score range: 0-9 bands',
             'Two types: Academic & General',
-            'Validity: 2 years',
-            'Fee: ₹16,250 (approx.)'
+            'Validity: 2 years from test date',
+            'Results: Available in 3-5 days'
         ],
         preparationTips: [
-            'Daily practice for balanced improvement',
-            'Regular timed mock tests',
+            'Practice all four skills daily',
+            'Take regular mock tests',
             'Focus on academic vocabulary'
         ]
     },
@@ -35,16 +35,16 @@ const examsData = [
         description: 'TOEFL iBT measures your ability to use and understand English at the university level. Accepted by 160+ countries and 11,500+ universities.',
         whoShouldTake: 'Students applying to American, Canadian universities, or English-speaking institutions.',
         testFormat: [
-            'Reading (54-72 minutes): 3-4 passages',
-            'Listening (41-57 minutes): Academic lectures',
-            'Speaking (17 minutes): 4 tasks',
-            'Writing (50 minutes): 2 tasks'
+            'Reading (54-72 mins): 3-4 passages',
+            'Listening (41-57 mins): Academic lectures',
+            'Speaking (17 mins): 4 tasks',
+            'Writing (50 mins): 2 tasks'
         ],
         details: [
-            'Score range: 0-120',
-            'Fully internet-based (iBT)',
+            'Score range: 0-120 (30 pts/section)',
+            'Duration: ~3 hours',
             'Validity: 2 years',
-            'Fee: $185-220 USD'
+            'Results: Available in 4-8 days'
         ],
         preparationTips: [
             'Master integrated note-taking',
@@ -56,55 +56,132 @@ const examsData = [
         name: 'GRE',
         fullName: 'Graduate Record Examination',
         color: 'indigo',
-        description: "Measures verbal reasoning, quantitative reasoning, and analytical writing skills. Required for admission to graduate and business schools worldwide.",
-        whoShouldTake: "Students applying for Master's, PhD, MBA, and other graduate programs globally.",
+        description: "The GRE General Test measures verbal reasoning, quantitative reasoning, and analytical writing skills. Required for admission to graduate and business schools worldwide.",
+        whoShouldTake: "Students applying for Master's, PhD, MBA, and other graduate programs globally. Strongly preferred in the USA.",
         testFormat: [
             'Analytical Writing: 2 essays',
             'Verbal Reasoning: 2 sections',
             'Quantitative Reasoning: 2 sections',
-            'Adaptive difficulty per section'
+            'Computer-adaptive format'
         ],
         details: [
             'Score range: 260-340',
+            'Duration: ~3 hrs 45 mins',
             'Validity: 5 years',
-            'Fee: $220 USD worldwide',
-            'Accepted by thousands of programs'
+            'Fee: $220 USD worldwide'
         ],
         preparationTips: [
             'Master high-frequency vocabulary',
             'Practice mental math shortcuts',
-            'Take adaptive mock tests'
+            'Take full adaptive mock tests'
         ]
     },
     {
         name: 'PTE',
         fullName: 'Pearson Test of English Academic',
         color: 'emerald',
-        description: 'Computer-based English test for study abroad and immigration. Known for fast results and unbiased AI scoring.',
-        whoShouldTake: 'Students seeking faster results (within 48 hours). Popular for Australia and New Zealand.',
+        description: 'Computer-based English test for study abroad and immigration. Known for fast results and unbiased AI scoring, assessing real-life academic English.',
+        whoShouldTake: 'Students seeking faster results and computer-based testing. Popular for Australia, New Zealand, UK, and Canada.',
         testFormat: [
             'Speaking & Writing (54-67 mins)',
-            'Reading (29-30 minutes)',
-            'Listening (30-43 minutes)',
-            'Integrated AI scoring'
+            'Reading (29-30 mins)',
+            'Listening (30-43 mins)',
+            'AI integrated scoring'
         ],
         details: [
             'Score range: 10-90 points',
             'Fully computer-based',
             'Validity: 2 years',
-            'Results: Within 48 hours'
+            'Results: Within 48 hours!'
         ],
         preparationTips: [
             'Master computerized interface',
-            'Practice clear mic speaking',
-            'Template-based writing strategy'
+            'Practice speaking clearly',
+            'Learn template-based strategies'
         ]
+    },
+    {
+        name: 'Duolingo',
+        fullName: 'Duolingo English Test',
+        color: 'teal',
+        description: 'An affordable, convenient online English proficiency test. Completed entirely online in under an hour, it\'s increasingly accepted globally.',
+        whoShouldTake: 'Students needing a fast, low-cost online alternative. Accepted by thousands of universities worldwide.',
+        testFormat: [
+            'Adaptive Setup (5 mins)',
+            'Graded Test (45 mins)',
+            'Video Interview (10 mins)',
+            'All sections computer-adaptive'
+        ],
+        details: [
+            'Score range: 10-160',
+            'Duration: Under 1 hour',
+            'Fee: ~$59 USD (very affordable)',
+            'Results: Within 48 hours'
+        ],
+        preparationTips: [
+            'Use free official practice tests',
+            'Ensure stable internet',
+            'Familiarize with adaptive formats'
+        ]
+    }
+];
+
+const destinationsData = [
+    {
+        name: 'United States', flag: '🇺🇸',
+        img: '/abroad-assets/usa_study_destination_1767878848400.png',
+        universities: '200+ Universities', highlights: 'Ivy League, Tech Hubs, Research Excellence',
+        desc: 'Study in the world\'s leading economy with access to cutting-edge research, innovation, and career opportunities.',
+        topUniversities: ['Harvard', 'Stanford', 'MIT', 'Yale'],
+    },
+    {
+        name: 'United Kingdom', flag: '🇬🇧',
+        img: '/abroad-assets/uk_study_destination_1767878865705.png',
+        universities: '100+ Universities', highlights: 'Oxford, Cambridge, World-Class Education',
+        desc: 'Experience historic academic excellence combined with modern innovation in the UK\'s prestigious universities.',
+        topUniversities: ['Oxford', 'Cambridge', 'Imperial College', 'LSE'],
+    },
+    {
+        name: 'Canada', flag: '🇨🇦',
+        img: '/abroad-assets/canada_study_destination_1767878895785.png',
+        universities: '80+ Universities', highlights: 'Immigration Benefits, Quality Education',
+        desc: 'Enjoy high-quality education with excellent post-study work opportunities and immigration pathways.',
+        topUniversities: ['UofT', 'UBC', 'McGill', 'Waterloo'],
+    },
+    {
+        name: 'Australia', flag: '🇦🇺',
+        img: '/abroad-assets/australia_study_destination_1767878913275.png',
+        universities: '60+ Universities', highlights: 'Work Opportunities, Beach Lifestyle',
+        desc: 'Experience world-class education in a vibrant, multicultural environment with excellent work-life balance.',
+        topUniversities: ['Melbourne', 'Sydney', 'ANU', 'UNSW'],
+    },
+    {
+        name: 'Ireland', flag: '🇮🇪',
+        img: '/abroad-assets/ireland_university.png',
+        universities: '30+ Universities', highlights: '2-Year Post-Study Work Permit',
+        desc: 'Study in the Emerald Isle with access to quality education, friendly culture, and excellent post-study work opportunities.',
+        topUniversities: ['Trinity College', 'UCD', 'NUI Galway', 'UCC'],
+    },
+    {
+        name: 'New Zealand', flag: '🇳🇿',
+        img: '/abroad-assets/new_zealand_university.png',
+        universities: '40+ Universities', highlights: 'High-Quality Education & Natural Beauty',
+        desc: 'Experience world-renowned education in stunning natural landscapes with welcoming communities and work opportunities.',
+        topUniversities: ['Auckland', 'Otago', 'Victoria', 'Canterbury'],
+    },
+    {
+        name: 'Europe', flag: '🇪🇺',
+        img: '/abroad-assets/europe_study_destination_1767878934797.png',
+        universities: '150+ Universities', highlights: 'Affordable Tuition, Cultural Diversity',
+        desc: 'Explore diverse cultures while accessing affordable, high-quality education across European nations.',
+        topUniversities: ['ETH Zurich', 'TU Munich', 'Sorbonne', 'KU Leuven'],
     }
 ];
 
 const AbroadConsultancy = () => {
     const { openServiceModal } = useUI();
     const [activeTab, setActiveTab] = useState('study');
+    const [selectedCountry, setSelectedCountry] = useState(null);
 
     return (
         <div className="pt-3 min-h-screen">
@@ -197,19 +274,22 @@ const AbroadConsultancy = () => {
                             </div>
                             
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                                {[
-                                    { name: "USA", desc: "Pinnacle of research & technology.", img: "https://images.unsplash.com/photo-1496442226666-8d4d1e410417?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" },
-                                    { name: "UK", desc: "Rich academic heritage & short programs.", img: "https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" },
-                                    { name: "Canada", desc: "Welcoming culture & excellent PR path.", img: "https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" },
-                                    { name: "Australia", desc: "High living standards & diverse society.", img: "https://images.unsplash.com/photo-1523482580672-f109ba8cb9be?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" },
-                                    { name: "Germany", desc: "Pioneers in engineering and low tuition fees.", img: "https://images.unsplash.com/photo-1599946347371-68eb71b16afc?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" }
-                                ].map((country, idx) => (
-                                    <div key={idx} className="relative rounded-[2rem] overflow-hidden group shadow-lg h-64 border border-gray-100">
+                                {destinationsData.map((country, idx) => (
+                                    <div 
+                                        key={idx} 
+                                        onClick={() => setSelectedCountry(country)}
+                                        className="relative rounded-[2rem] overflow-hidden group shadow-lg h-80 border border-gray-100 cursor-pointer"
+                                    >
                                         <img src={country.img} alt={country.name} className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700" />
-                                        <div className="absolute inset-0 bg-gradient-to-t from-gray-900/90 via-gray-900/30 to-transparent"></div>
-                                        <div className="absolute bottom-6 left-6 right-6">
-                                            <h3 className="text-2xl font-bold text-white mb-2">{country.name}</h3>
-                                            <p className="text-sky-100/90 text-sm">{country.desc}</p>
+                                        <div className="absolute inset-0 bg-gradient-to-t from-gray-900/90 via-gray-900/50 to-transparent"></div>
+                                        <div className="absolute bottom-6 left-6 right-6 text-white">
+                                            <div className="text-4xl mb-2">{country.flag}</div>
+                                            <h3 className="text-2xl font-bold mb-1">{country.name}</h3>
+                                            <p className="text-sky-200 text-[10px] font-bold uppercase tracking-wider mb-2">{country.universities}</p>
+                                            <p className="text-sky-100/90 text-sm line-clamp-2">{country.desc}</p>
+                                            <div className="mt-4 opacity-0 group-hover:opacity-100 transition-opacity">
+                                                <span className="text-sky-300 font-bold text-sm flex items-center gap-1">View Details <ArrowRight size={14} /></span>
+                                            </div>
                                         </div>
                                     </div>
                                 ))}
@@ -341,8 +421,34 @@ const AbroadConsultancy = () => {
                     </motion.div>
                 )}
             </div>
+
+            {/* Application Services & Timeline */}
+            <section className="py-16 mt-8 bg-sky-50">
+                <div className="container-custom">
+                    <div className="text-center max-w-2xl mx-auto mb-12">
+                        <span className="text-sky-600 font-bold tracking-widest uppercase text-xs mb-3 block">Our Services</span>
+                        <h2 className="text-3xl md:text-4xl font-bold text-gray-900 font-display">How We Fast-Track <br/>Your Global Success</h2>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 relative">
+                        {[
+                            { step: '01', title: 'Initial Consultation', desc: 'Complimentary personalized counseling session to understand your goals and profile.', time: '1 Hour' },
+                            { step: '02', title: 'University Shortlisting', desc: 'Curated list of universities matching your profile, budget, and career aspirations.', time: '1-2 Days' },
+                            { step: '03', title: 'Application Prep', desc: 'Comprehensive support for essays, SOPs, LORs, and documentation.', time: '1-2 Days' },
+                            { step: '04', title: 'Visa & Departure', desc: 'Expert assistance with visa documentation, interview prep, and submission.', time: '2-3 Days' }
+                        ].map((process, idx) => (
+                            <div key={idx} className="bg-white p-8 rounded-3xl shadow-sm border border-sky-100 relative group hover:shadow-xl hover:-translate-y-2 transition-all">
+                                <div className="text-5xl font-display font-black text-sky-100 mb-6 group-hover:text-sky-50 transition-colors">{process.step}</div>
+                                <h3 className="text-xl font-bold text-gray-900 mb-3">{process.title}</h3>
+                                <p className="text-gray-600 text-sm leading-relaxed mb-4 min-h-[60px]">{process.desc}</p>
+                                <span className="inline-block px-3 py-1 bg-indigo-50 text-indigo-600 rounded-full text-xs font-bold tracking-wider">{process.time}</span>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            </section>
             
-            <section className="py-16 bg-gradient-to-r from-sky-900 to-indigo-900 text-white rounded-t-[3rem] mt-auto">
+            <section className="py-16 bg-gradient-to-r from-sky-900 to-indigo-900 text-white mt-auto">
                 <div className="container-custom">
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center divide-x divide-white/20">
                         <div>
@@ -364,6 +470,74 @@ const AbroadConsultancy = () => {
                     </div>
                 </div>
             </section>
+
+            {/* Country Details Modal */}
+            <AnimatePresence>
+                {selectedCountry && (
+                    <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[110] flex items-center justify-center p-4">
+                        <motion.div
+                            initial={{ scale: 0.9, opacity: 0 }}
+                            animate={{ scale: 1, opacity: 1 }}
+                            exit={{ scale: 0.9, opacity: 0 }}
+                            onClick={() => setSelectedCountry(null)}
+                            className="absolute inset-0"
+                        />
+                        <motion.div
+                            initial={{ scale: 0.95, opacity: 0, y: 20 }}
+                            animate={{ scale: 1, opacity: 1, y: 0 }}
+                            exit={{ scale: 0.95, opacity: 0, y: 20 }}
+                            className="relative w-full max-w-2xl bg-white p-8 md:p-12 rounded-3xl shadow-2xl z-10"
+                        >
+                            <div className="flex items-center justify-between mb-6">
+                                <div className="flex items-center gap-4">
+                                    <span className="text-5xl">{selectedCountry.flag}</span>
+                                    <h2 className="text-3xl font-display font-bold text-gray-900">
+                                        {selectedCountry.name}
+                                    </h2>
+                                </div>
+                                <button
+                                    onClick={() => setSelectedCountry(null)}
+                                    className="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 hover:bg-slate-200 hover:text-slate-700 transition-colors"
+                                >
+                                    <X size={20} />
+                                </button>
+                            </div>
+
+                            <p className="text-gray-600 text-lg mb-6 leading-relaxed">
+                                {selectedCountry.desc}
+                            </p>
+
+                            <div className="mb-6 bg-sky-50 rounded-2xl p-6 border border-sky-100">
+                                <h3 className="font-display font-bold text-lg text-sky-900 mb-4 flex items-center gap-2">
+                                    <Award size={20} className="text-sky-500"/> Top Universities
+                                </h3>
+                                <div className="flex flex-wrap gap-2">
+                                    {selectedCountry.topUniversities.map((uni, i) => (
+                                        <span key={i} className="px-4 py-2 bg-white text-sky-700 border border-sky-200 rounded-full text-sm font-bold shadow-sm">
+                                            {uni}
+                                        </span>
+                                    ))}
+                                </div>
+                            </div>
+
+                            <div className="text-sm font-medium text-slate-500 mb-8 flex items-center gap-2">
+                                <CheckCircle size={16} className="text-emerald-500"/>
+                                Access to <strong>{selectedCountry.universities}</strong> worldwide.
+                            </div>
+
+                            <button
+                                onClick={() => {
+                                    setSelectedCountry(null);
+                                    openServiceModal('abroad', `Study in ${selectedCountry.name}`);
+                                }}
+                                className="w-full px-8 py-4 bg-gradient-to-r from-sky-500 to-indigo-600 text-white rounded-xl font-bold shadow-lg shadow-sky-200 hover:-translate-y-1 transition-all flex items-center justify-center gap-2"
+                            >
+                                Start Your Application Process <ArrowRight size={18}/>
+                            </button>
+                        </motion.div>
+                    </div>
+                )}
+            </AnimatePresence>
         </div>
     );
 };

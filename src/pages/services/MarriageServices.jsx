@@ -34,30 +34,12 @@ const MarriageServices = () => {
         }
     };
 
+    const handleLoginClick = () => {
+        openServiceModal('marriage', 'Matrimony Login', true);
+    };
+
     return (
         <div className="min-h-screen relative">
-            {/* Matrimony Specific Top-Right Profile Badge */}
-            {matrimonyProfile && (
-                <div className="fixed top-32 right-6 md:right-10 z-[60]">
-                    <button
-                        onClick={openProfile}
-                        className="flex items-center space-x-2 px-6 py-2.5 rounded-full font-sans font-semibold transition-all duration-300 shadow-xl border border-gold-200 bg-white text-gray-800 hover:bg-gray-50 scale-100 hover:scale-105"
-                    >
-                        <div className="w-8 h-8 -ml-2 rounded-full bg-rose-100 text-rose-600 flex items-center justify-center overflow-hidden border border-rose-200">
-                            {matrimonyProfile.profilePhoto ? (
-                                <img 
-                                    src={`http://localhost:5000${matrimonyProfile.profilePhoto}`} 
-                                    alt="Profile" 
-                                    className="w-full h-full object-cover"
-                                />
-                            ) : (
-                                <User size={16} />
-                            )}
-                        </div>
-                        <span className="max-w-[100px] truncate">{matrimonyProfile.firstName || 'My Profile'}</span>
-                    </button>
-                </div>
-            )}
 
             {/* Hero */}
             <section className="relative rounded-[2.5rem] margin-x-custom mx-4 md:mx-6 mb-16 overflow-hidden min-h-[600px] flex items-center shadow-2xl shadow-rose-100/50">
@@ -91,27 +73,67 @@ const MarriageServices = () => {
                                 We blend traditional values with modern preferences to help you write your perfect love story. Verified profiles, absolute privacy, and personalized matchmaking.
                             </p>
 
-                            {!matrimonyProfile && (
-                                <button onClick={handleRegisterHeroClick} className="mb-6 bg-gray-900 text-white px-8 py-4 rounded-full font-bold hover:bg-rose-600 transition-colors shadow-xl shadow-rose-200 flex items-center gap-2">
-                                    <Users size={20} />
-                                    Register Your Profile
-                                </button>
-                            )}
 
-                            {/* Find Your Match Button — only for paid active profiles */}
-                            {matrimonyProfile && matrimonyProfile.paymentStatus === 'paid' && (
-                                <motion.button
-                                    initial={{ opacity: 0, scale: 0.9 }}
-                                    animate={{ opacity: 1, scale: 1 }}
-                                    transition={{ delay: 0.3 }}
-                                    onClick={() => navigate('/services/marriage/matches')}
-                                    className="mb-8 flex items-center gap-3 px-8 py-4 rounded-full font-bold text-white bg-gradient-to-r from-rose-500 via-pink-500 to-purple-500 shadow-xl shadow-rose-300/50 hover:shadow-2xl hover:shadow-rose-400/60 hover:scale-105 transform transition-all duration-300 text-lg group"
-                                >
-                                    <Heart size={20} className="group-hover:animate-bounce" fill="currentColor" />
-                                    Let's Find Your Match
-                                    <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
-                                </motion.button>
-                            )}
+
+                            {/* Dynamic Hero Buttons */}
+                            <div className="flex flex-wrap items-center gap-4 mb-8">
+                                {!matrimonyProfile ? (
+                                    <motion.button
+                                        onClick={handleLoginClick}
+                                        whileHover={{ scale: 1.05 }}
+                                        whileTap={{ scale: 0.95 }}
+                                        className="flex items-center gap-2 px-8 py-3.5 rounded-full font-bold text-gray-900 bg-white/90 backdrop-blur-sm shadow-xl border border-white/40 hover:shadow-2xl hover:bg-white transition-all duration-300 group"
+                                    >
+                                        <div className="w-6 h-6 rounded-full bg-rose-100 flex items-center justify-center">
+                                            <User size={14} className="text-rose-600" />
+                                        </div>
+                                        <span>Member Access</span>
+                                        <ArrowRight size={16} className="text-gray-400 group-hover:translate-x-1 transition-transform ml-1" />
+                                    </motion.button>
+                                ) : (
+                                    <>
+                                        {matrimonyProfile.paymentStatus === 'paid' ? (
+                                            <motion.button
+                                                initial={{ opacity: 0, scale: 0.9 }}
+                                                animate={{ opacity: 1, scale: 1 }}
+                                                onClick={() => navigate('/services/marriage/matches')}
+                                                className="flex items-center gap-3 px-8 py-4 rounded-full font-bold text-white bg-gradient-to-r from-rose-500 via-pink-500 to-purple-500 shadow-xl shadow-rose-300/50 hover:shadow-2xl hover:shadow-rose-400/60 hover:scale-105 transform transition-all duration-300 text-lg group"
+                                            >
+                                                <Heart size={20} className="group-hover:animate-bounce" fill="currentColor" />
+                                                Let's Find Your Match
+                                                <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
+                                            </motion.button>
+                                        ) : (
+                                            <motion.button
+                                                initial={{ opacity: 0, scale: 0.9 }}
+                                                animate={{ opacity: 1, scale: 1 }}
+                                                onClick={() => openServiceModal('marriage', 'Activate Matrimony Profile')}
+                                                className="flex items-center gap-2 px-8 py-3.5 rounded-full font-bold text-white bg-gray-900 shadow-xl hover:shadow-2xl hover:bg-rose-600 hover:scale-105 transition-all duration-300"
+                                            >
+                                                <Shield size={18} />
+                                                Activate Profile to Match
+                                            </motion.button>
+                                        )}
+
+                                        {/* Embedded Profile Button */}
+                                        <motion.button
+                                            initial={{ opacity: 0, scale: 0.9 }}
+                                            animate={{ opacity: 1, scale: 1 }}
+                                            onClick={openProfile}
+                                            className="flex items-center gap-3 px-6 py-3.5 rounded-full font-bold text-gray-900 bg-white/90 backdrop-blur-sm shadow-xl border border-white/40 hover:shadow-2xl hover:bg-white transition-all duration-300"
+                                        >
+                                            <div className="w-8 h-8 rounded-full bg-rose-100 flex items-center justify-center overflow-hidden border border-rose-200">
+                                                {matrimonyProfile.profilePhoto ? (
+                                                    <img src={`http://localhost:5000${matrimonyProfile.profilePhoto}`} alt="Profile" className="w-full h-full object-cover" />
+                                                ) : (
+                                                    <User size={14} className="text-rose-600" />
+                                                )}
+                                            </div>
+                                            <span>My Profile</span>
+                                        </motion.button>
+                                    </>
+                                )}
+                            </div>
 
 
                         </div>
@@ -144,6 +166,117 @@ const MarriageServices = () => {
                             </div>
                         ))}
                     </div>
+                </div>
+            </section>
+
+            {/* ── Register Your Profile CTA Section ─────────────────────────── */}
+            <section className="py-16 px-4 md:px-6">
+                <div className="container-custom">
+                    <motion.div
+                        initial={{ opacity: 0, y: 30 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: true }}
+                        className="relative rounded-[2.5rem] overflow-hidden bg-gradient-to-br from-rose-50 via-pink-50 to-orange-50 border border-rose-100 shadow-2xl shadow-rose-100/40 p-8 md:p-14"
+                    >
+                        {/* Background Decorative Blobs */}
+                        <div className="absolute -top-20 -right-20 w-72 h-72 bg-rose-200/40 rounded-full blur-3xl pointer-events-none" />
+                        <div className="absolute -bottom-16 -left-16 w-56 h-56 bg-pink-200/30 rounded-full blur-3xl pointer-events-none" />
+
+                        <div className="relative z-10 flex flex-col lg:flex-row items-center gap-12">
+                            {/* Left — Info */}
+                            <div className="flex-1">
+                                <span className="text-rose-500 font-bold tracking-widest uppercase text-xs mb-4 block">
+                                    Begin Your Journey
+                                </span>
+                                <h2 className="text-3xl md:text-4xl font-bold text-gray-900 font-display mb-4 leading-tight">
+                                    Register Your Profile &<br />
+                                    <span className="text-transparent bg-clip-text bg-gradient-to-r from-rose-600 to-pink-600">
+                                        Find Your Soulmate
+                                    </span>
+                                </h2>
+                                <p className="text-gray-600 text-base leading-relaxed mb-8 max-w-lg">
+                                    Join thousands of families who trust Sri Kanishka Matrimony. Create your verified profile today and get matched with compatible life partners — all in complete privacy.
+                                </p>
+
+                                {/* Data collected */}
+                                <div className="mb-8">
+                                    <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-3">What We Collect</p>
+                                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                                        {[
+                                            '👤 Personal Details', '🏠 Family Background', '🎓 Education & Career',
+                                            '🕉️ Religion & Caste', '📸 Profile Photo', '📞 Contact Info'
+                                        ].map((item, i) => (
+                                            <div key={i} className="flex items-center gap-2 bg-white/80 border border-rose-100 rounded-xl px-3 py-2 text-xs font-semibold text-gray-700 shadow-sm">
+                                                {item}
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+
+                                {/* Trust badges */}
+                                <div className="flex flex-wrap gap-3">
+                                    {['🔒 100% Private', '✅ Verified Profiles', '📋 MSME Certified'].map((b, i) => (
+                                        <span key={i} className="text-xs font-bold text-rose-700 bg-rose-100 border border-rose-200 px-3 py-1 rounded-full">{b}</span>
+                                    ))}
+                                </div>
+                            </div>
+
+                            {/* Right — Payment Card + CTA */}
+                            <div className="w-full lg:w-80 flex flex-col items-center">
+                                {/* Payment info card */}
+                                <div className="w-full bg-white rounded-2xl shadow-xl border border-rose-100 p-6 mb-6">
+                                    <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-4 text-center">Lifetime Registration</p>
+                                    <div className="text-center mb-4">
+                                        <div className="text-5xl font-black text-gray-900 font-display">₹499</div>
+                                        <div className="text-sm text-gray-400 font-medium mt-1">One-time · No renewals · Ever</div>
+                                    </div>
+                                    <ul className="space-y-2 mb-5">
+                                        {[
+                                            'Unlimited profile browsing',
+                                            'Direct contact with matches',
+                                            'Priority listing in search',
+                                            'Dedicated relationship manager',
+                                            'Lifetime profile visibility',
+                                        ].map((f, i) => (
+                                            <li key={i} className="flex items-center gap-2 text-sm text-gray-600">
+                                                <CheckCircle size={14} className="text-rose-500 flex-shrink-0" />
+                                                {f}
+                                            </li>
+                                        ))}
+                                    </ul>
+                                    <div className="text-[10px] text-gray-400 text-center font-medium border-t border-gray-100 pt-3">
+                                        Payment collected after profile review · Secure & safe
+                                    </div>
+                                </div>
+
+                                {/* Animated Register Button */}
+                                <div className="relative w-full flex justify-center">
+                                    {/* Pulse rings */}
+                                    <span className="absolute inset-0 rounded-full bg-rose-400/30 animate-ping" style={{ animationDuration: '1.8s' }} />
+                                    <span className="absolute inset-1 rounded-full bg-rose-300/20 animate-ping" style={{ animationDuration: '2.4s', animationDelay: '0.3s' }} />
+                                    <motion.button
+                                        onClick={handleRegisterHeroClick}
+                                        whileHover={{ scale: 1.06 }}
+                                        whileTap={{ scale: 0.95 }}
+                                        animate={{ y: [0, -6, 0] }}
+                                        transition={{ repeat: Infinity, duration: 2.5, ease: 'easeInOut' }}
+                                        className="relative z-10 w-full flex items-center justify-center gap-3 px-8 py-4 rounded-full font-bold text-white text-base bg-gradient-to-r from-rose-500 via-pink-500 to-rose-600 shadow-xl shadow-rose-300/50 hover:shadow-2xl hover:shadow-rose-400/60 transition-all"
+                                    >
+                                        <Users size={20} />
+                                        Register Your Profile
+                                        <ArrowRight size={18} />
+                                    </motion.button>
+                                </div>
+                                {!matrimonyProfile ? (
+                                    <div className="mt-4 text-center">
+                                        <p className="text-xs text-gray-400">Free to register · Pay only after approval</p>
+                                    </div>
+                                ) : (
+                                    <p className="text-xs text-gray-400 mt-4 text-center">Your profile is currently {matrimonyProfile.status}</p>
+                                )}
+                            </div>
+                        </div>
+                    </motion.div>
                 </div>
             </section>
 

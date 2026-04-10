@@ -72,102 +72,95 @@ const MatchCard = ({ profile, myProfile, onViewProfile, index }) => {
 
     return (
         <motion.div
-            initial={{ opacity: 0, y: 40 }}
+            initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: index * 0.1, ease: 'easeOut' }}
+            transition={{ duration: 0.4, delay: index * 0.05, ease: 'easeOut' }}
             onClick={() => onViewProfile(profile)}
-            className="group relative h-[420px] rounded-3xl overflow-hidden cursor-pointer shadow-lg hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2"
+            className="group relative h-[380px] rounded-3xl overflow-hidden cursor-pointer shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 bg-white"
         >
             {/* Background Image / Gradient */}
             {profile.profilePhoto ? (
                 <img
                     src={`http://localhost:5000${profile.profilePhoto}`}
                     alt={profile.firstName}
-                    className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                    className="absolute inset-0 w-full h-[80%] object-cover transition-transform duration-700 group-hover:scale-105"
                 />
             ) : (
-                <div className="absolute inset-0 bg-gradient-to-br from-rose-200 via-pink-200 to-purple-300 flex items-center justify-center transition-transform duration-700 group-hover:scale-110">
-                    <div className="w-32 h-32 rounded-full bg-white/40 backdrop-blur-sm flex items-center justify-center text-rose-600 font-bold text-5xl font-display shadow-2xl">
+                <div className="absolute inset-0 h-[80%] bg-gradient-to-br from-rose-100 via-pink-100 to-rose-200 flex items-center justify-center transition-transform duration-700 group-hover:scale-105">
+                    <div className="w-24 h-24 rounded-full bg-white/60 backdrop-blur-sm flex items-center justify-center text-rose-500 font-bold text-4xl font-display shadow-md">
                         {getInitials(profile)}
                     </div>
                 </div>
             )}
 
-            {/* Dark Overlays for Text Readability */}
-            <div className="absolute inset-0 bg-gradient-to-t from-gray-900/90 via-gray-900/40 to-transparent transition-opacity duration-300" />
-            
-            {/* Top Match Badge */}
-            {isTopMatch && (
-                <div className="absolute top-4 left-4 z-10">
-                    <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/20 backdrop-blur-md border border-white/40 text-white text-xs font-bold shadow-xl">
-                        <Sparkles size={12} className="text-pink-300" />
+            {/* Gradient Overlay for Top Image */}
+            <div className="absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-gray-900/40 to-transparent z-10" />
+
+            {/* Top Badges */}
+            <div className="absolute top-3 w-full px-3 z-20 flex justify-between items-start">
+                {isTopMatch ? (
+                    <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white/90 backdrop-blur-md shadow-sm text-pink-600 text-[10px] font-bold uppercase tracking-widest border border-white">
+                        <Sparkles size={10} />
                         Top Match
                     </div>
-                </div>
-            )}
-
-            {/* Compatibility Ring - Top Right */}
-            <div className="absolute top-4 right-4 z-10 w-12 h-12 rounded-full bg-white/10 backdrop-blur-md border border-white/20 flex flex-col items-center justify-center shadow-xl">
-                <span className="text-white font-bold text-sm tracking-tighter">{compat}%</span>
-                <span className="text-white/70 text-[8px] uppercase tracking-wider -mt-1">Match</span>
-            </div>
-
-            {/* Quick Actions - Floating on hover */}
-            <div className="absolute right-4 bottom-32 z-20 flex flex-col gap-3 translate-x-12 opacity-0 group-hover:translate-x-0 group-hover:opacity-100 transition-all duration-300">
-                <button
-                    onClick={handleLike}
-                    className={`w-12 h-12 rounded-full flex items-center justify-center shadow-xl backdrop-blur-md transition-all hover:scale-110 ${
-                        liked 
-                        ? 'bg-rose-500 text-white' 
-                        : 'bg-white/20 text-white hover:bg-white/40 border border-white/30'
-                    }`}
-                >
-                    <Heart size={20} fill={liked ? 'currentColor' : 'none'} />
-                </button>
-            </div>
-
-            {/* Profile Info - Bottom */}
-            <div className="absolute bottom-0 left-0 right-0 p-5 z-10 transform translate-y-2 group-hover:translate-y-0 transition-transform duration-300">
-                <h3 className="text-2xl font-bold text-white font-display mb-1 flex items-center gap-2">
-                    {profile.firstName} {profile.lastName?.charAt(0)}.
-                    {age && <span className="text-white/80 font-normal text-xl">{age}</span>}
-                    <Shield size={16} className="text-blue-400 fill-blue-400/20" />
-                </h3>
+                ) : <div />}
                 
-                <div className="text-white/80 text-sm flex items-center gap-2 mb-3">
-                    <Briefcase size={14} className="text-rose-300" />
-                    <span className="truncate">{profile.profileData?.profession || 'Professional'}</span>
+                <div className="w-9 h-9 flex flex-col items-center justify-center bg-white/90 backdrop-blur-md rounded-full border border-white shadow-sm text-rose-600 font-bold leading-tight">
+                    <span className="text-[11px]">{compat}%</span>
+                </div>
+            </div>
+
+            {/* Bottom Info Card */}
+            <div className="absolute bottom-0 inset-x-0 h-[45%] bg-white rounded-t-3xl pt-2 pb-4 px-5 z-20 shadow-[0_-10px_40px_rgba(0,0,0,0.1)] flex flex-col justify-between transition-all duration-300 group-hover:h-[50%]">
+                <div>
+                    <h3 className="text-xl font-bold text-gray-900 font-display flex items-center gap-2">
+                        {profile.firstName} {profile.lastName?.charAt(0)}.
+                        {age && <span className="text-gray-500 font-normal text-lg">{age}</span>}
+                        <Shield size={14} className="text-blue-500 fill-blue-100 ml-auto" />
+                    </h3>
+                    
+                    <div className="text-gray-600 text-xs flex items-center gap-2 mt-1 font-medium">
+                        <Briefcase size={12} className="text-gray-400" />
+                        <span className="truncate">{profile.profileData?.profession || 'Professional'}</span>
+                    </div>
+
+                    <div className="flex flex-wrap gap-1.5 mt-3">
+                        {profile.profileData?.religion && (
+                            <span className="px-2 py-0.5 bg-gray-50 border border-gray-100 text-gray-500 rounded text-[10px] uppercase font-bold tracking-wider">
+                                {profile.profileData.religion}
+                            </span>
+                        )}
+                        {profile.profileData?.maritalStatus && (
+                            <span className="px-2 py-0.5 bg-gray-50 border border-gray-100 text-gray-500 rounded text-[10px] uppercase font-bold tracking-wider">
+                                {profile.profileData.maritalStatus}
+                            </span>
+                        )}
+                    </div>
                 </div>
 
-                {/* Tags Grid */}
-                <div className="flex flex-wrap gap-2 mb-4">
-                    {profile.profileData?.religion && (
-                        <span className="px-2.5 py-1 bg-white/10 backdrop-blur-sm border border-white/10 text-white rounded-lg text-xs font-medium">
-                            {profile.profileData.religion}
-                        </span>
-                    )}
-                    {profile.profileData?.education && (
-                        <span className="px-2.5 py-1 bg-white/10 backdrop-blur-sm border border-white/10 text-white rounded-lg text-xs font-medium">
-                            {profile.profileData.education}
-                        </span>
-                    )}
-                    <span className="px-2.5 py-1 bg-white/10 backdrop-blur-sm border border-white/10 text-white rounded-lg text-xs font-medium">
-                        {profile.profileData?.maritalStatus}
-                    </span>
-                </div>
+                <hr className="border-gray-50 my-2" />
 
-                {/* View Details Text (appears on hover) */}
-                <div className="overflow-hidden h-0 group-hover:h-8 transition-all duration-300 flex items-center">
-                    <span className="text-pink-300 font-bold text-sm flex items-center gap-1">
-                        View Full Profile <ArrowLeft size={14} className="rotate-180" />
+                <div className="flex items-center justify-between">
+                    <span className="text-rose-500 text-xs font-bold flex items-center gap-1 group-hover:text-rose-600">
+                        View Profile <ArrowLeft size={12} className="rotate-180" />
                     </span>
+                    <button
+                        onClick={handleLike}
+                        className={`w-8 h-8 rounded-full flex items-center justify-center transition-all ${
+                            liked 
+                            ? 'bg-rose-500 text-white shadow-md shadow-rose-200' 
+                            : 'bg-gray-50 text-gray-400 hover:bg-rose-50 border border-gray-200 hover:text-rose-500 hover:border-rose-200'
+                        }`}
+                    >
+                        <Heart size={14} fill={liked ? 'currentColor' : 'none'} />
+                    </button>
                 </div>
             </div>
         </motion.div>
     );
 };
 
-// ─── Profile Detail Modal (Sleek Side Sheet / Centered) ────────────────────────
+// ─── Profile Detail Modal (No changes to inside component structure) ───────────
 
 const ProfileDetailModal = ({ profile, myProfile, onClose }) => {
     const { showToast } = useUI();
@@ -326,66 +319,96 @@ const ProfileDetailModal = ({ profile, myProfile, onClose }) => {
     );
 };
 
-// ─── Floating Filter Bar ──────────────────────────────────────────────────────
+// ─── Sidebar Filter Component ──────────────────────────────────────────────────
 
-const FloatingFilterBar = ({ filters, setFilters, stats }) => {
+const FilterSidebar = ({ filters, setFilters, stats }) => {
     return (
-        <div className="sticky top-24 z-40 w-full px-4 transform -translate-y-6">
-            <div className="max-w-4xl mx-auto bg-white/80 backdrop-blur-xl rounded-2xl shadow-xl shadow-gray-200/50 border border-white p-3 md:p-4">
-                <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-                    <div className="flex-1 w-full grid grid-cols-2 md:grid-cols-4 gap-3">
-                        <select
-                            value={filters.gender}
-                            onChange={e => setFilters({ ...filters, gender: e.target.value })}
-                            className="w-full bg-white border border-gray-100/50 text-gray-700 text-sm rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-rose-200 shadow-sm cursor-pointer font-semibold appearance-none bg-[url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23F43F5E%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E')] bg-[length:10px_10px] bg-no-repeat bg-[position:right_1rem_center]"
-                        >
-                            <option value="">Any Gender</option>
-                            <option value="Male">Looking for Groom</option>
-                            <option value="Female">Looking for Bride</option>
-                        </select>
+        <div className="bg-white rounded-3xl shadow-sm border border-gray-100 p-6 sticky top-24">
+            <h3 className="text-sm font-bold text-gray-900 uppercase tracking-widest flex items-center gap-2 mb-6">
+                <Search size={16} className="text-rose-500" /> Refine Search
+            </h3>
+            
+            <div className="space-y-5">
+                <div>
+                    <label className="text-xs font-bold text-gray-400 uppercase tracking-wider block mb-2">Looking For</label>
+                    <select
+                        value={filters.gender}
+                        onChange={e => setFilters({ ...filters, gender: e.target.value })}
+                        className="w-full bg-gray-50 border border-gray-200 text-gray-700 text-sm rounded-xl px-4 py-3 outline-none focus:ring-1 focus:ring-rose-300 font-semibold cursor-pointer"
+                    >
+                        <option value="">Any Gender</option>
+                        <option value="Male">Match For Groom</option>
+                        <option value="Female">Match For Bride</option>
+                    </select>
+                </div>
 
-                        <select
-                            value={filters.ageRange}
-                            onChange={e => setFilters({ ...filters, ageRange: e.target.value })}
-                            className="w-full bg-white border border-gray-100/50 text-gray-700 text-sm rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-rose-200 shadow-sm cursor-pointer font-semibold appearance-none bg-[url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23F43F5E%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E')] bg-[length:10px_10px] bg-no-repeat bg-[position:right_1rem_center]"
-                        >
-                            {AGE_RANGES.map(r => (
-                                <option key={r.label} value={r.label}>{r.label}</option>
-                            ))}
-                        </select>
-
-                        <select
-                            value={filters.religion}
-                            onChange={e => setFilters({ ...filters, religion: e.target.value })}
-                            className="w-full bg-white border border-gray-100/50 text-gray-700 text-sm rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-rose-200 shadow-sm cursor-pointer font-semibold appearance-none bg-[url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23F43F5E%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E')] bg-[length:10px_10px] bg-no-repeat bg-[position:right_1rem_center]"
-                        >
-                            <option value="">Any Religion</option>
-                            <option>Hindu</option>
-                            <option>Muslim</option>
-                            <option>Christian</option>
-                            <option>Other</option>
-                        </select>
-
-                        <select
-                            value={filters.maritalStatus}
-                            onChange={e => setFilters({ ...filters, maritalStatus: e.target.value })}
-                            className="w-full bg-white border border-gray-100/50 text-gray-700 text-sm rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-rose-200 shadow-sm cursor-pointer font-semibold appearance-none bg-[url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23F43F5E%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E')] bg-[length:10px_10px] bg-no-repeat bg-[position:right_1rem_center]"
-                        >
-                            <option value="">Any Status</option>
-                            <option>Never Married</option>
-                            <option>Divorced</option>
-                            <option>Widowed</option>
-                        </select>
-                    </div>
-
-                    <div className="shrink-0">
-                        <span className="flex items-center gap-2 bg-rose-50 border border-rose-100 text-rose-600 px-5 py-3 rounded-xl font-bold text-sm shadow-sm md:w-auto w-full justify-center">
-                            <Sparkles size={16} /> 
-                            {stats.filtered} Profiles
-                        </span>
+                <div>
+                    <label className="text-xs font-bold text-gray-400 uppercase tracking-wider block mb-2">Age Range</label>
+                    <div className="grid grid-cols-2 gap-2">
+                        {AGE_RANGES.map(r => (
+                            <button
+                                key={r.label}
+                                onClick={() => setFilters({ ...filters, ageRange: r.label })}
+                                className={`py-2 px-1 text-xs font-bold rounded-lg border transition-all ${
+                                    filters.ageRange === r.label 
+                                    ? 'bg-rose-50 border-rose-200 text-rose-600' 
+                                    : 'bg-white border-gray-200 text-gray-500 hover:bg-gray-50'
+                                }`}
+                            >
+                                {r.label}
+                            </button>
+                        ))}
                     </div>
                 </div>
+
+                <div>
+                    <label className="text-xs font-bold text-gray-400 uppercase tracking-wider block mb-2">Religion</label>
+                    <select
+                        value={filters.religion}
+                        onChange={e => setFilters({ ...filters, religion: e.target.value })}
+                        className="w-full bg-gray-50 border border-gray-200 text-gray-700 text-sm rounded-xl px-4 py-3 outline-none focus:ring-1 focus:ring-rose-300 font-semibold cursor-pointer"
+                    >
+                        <option value="">Any Religion</option>
+                        <option>Hindu</option>
+                        <option>Muslim</option>
+                        <option>Christian</option>
+                        <option>Other</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label className="text-xs font-bold text-gray-400 uppercase tracking-wider block mb-2">Marital Status</label>
+                    <select
+                        value={filters.maritalStatus}
+                        onChange={e => setFilters({ ...filters, maritalStatus: e.target.value })}
+                        className="w-full bg-gray-50 border border-gray-200 text-gray-700 text-sm rounded-xl px-4 py-3 outline-none focus:ring-1 focus:ring-rose-300 font-semibold cursor-pointer"
+                    >
+                        <option value="">Any Status</option>
+                        <option>Never Married</option>
+                        <option>Divorced</option>
+                        <option>Widowed</option>
+                    </select>
+                </div>
             </div>
+
+            <hr className="my-6 border-gray-100" />
+            
+            <div className="bg-rose-50 rounded-xl p-4 flex items-center justify-between">
+                <div>
+                    <div className="text-[10px] uppercase tracking-widest font-bold text-rose-400">Total</div>
+                    <div className="text-rose-600 font-bold text-lg leading-tight">{stats.filtered} Profiles</div>
+                </div>
+                <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center text-rose-500 shadow-sm">
+                    <Sparkles size={16} />
+                </div>
+            </div>
+            
+            <button
+                onClick={() => setFilters({ gender: '', ageRange: 'Any Age', religion: '', maritalStatus: '' })}
+                className="w-full mt-4 py-3 text-xs font-bold text-gray-500 hover:text-gray-800 transition-colors uppercase tracking-wider"
+            >
+                Clear Filters
+            </button>
         </div>
     );
 };
@@ -459,134 +482,134 @@ const MatchDiscovery = () => {
     const standardMatches = sortedProfiles.filter(p => calcCompatibility(matrimonyProfile, p) < 75);
 
     return (
-        <div className="min-h-screen bg-gray-50 pb-20">
-            {/* ─── Hero Banner ─── */}
-            <section className="relative pt-24 pb-32 bg-[#1a0f1c] overflow-hidden">
-                <div className="absolute inset-0 z-0">
-                    <img 
-                        src="https://images.unsplash.com/photo-1543269664-76bc3997d9ea?q=80&w=2070&auto=format&fit=crop" 
-                        alt="Background" 
-                        className="w-full h-full object-cover opacity-20"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-gray-50 via-transparent to-transparent" />
-                    <div className="absolute inset-0 bg-gradient-to-r from-rose-900/40 to-purple-900/40" />
-                </div>
+        <div className="min-h-screen bg-[#f8f9fc] pt-24 pb-20">
+            <div className="container-custom px-4 sm:px-6">
 
-                <div className="container-custom relative z-10 flex flex-col items-center text-center">
-                    <div 
-                        className="inline-flex items-center gap-3 px-5 py-2 rounded-full bg-white/10 backdrop-blur-md border border-white/20 mb-8 cursor-pointer hover:bg-white/20 transition-all shadow-xl hover:-translate-y-1" 
-                        onClick={openProfile}
-                    >
-                        {matrimonyProfile?.profilePhoto ? (
-                            <img src={`http://localhost:5000${matrimonyProfile.profilePhoto}`} alt="You" className="w-8 h-8 rounded-full border border-white" />
-                        ) : (
-                            <div className="w-8 h-8 rounded-full bg-rose-500 flex items-center justify-center text-white font-bold text-xs">{getInitials(matrimonyProfile)}</div>
-                        )}
-                        <span className="text-white text-sm font-medium">Hello, {matrimonyProfile?.firstName} 👋</span>
-                    </div>
-
-                    <h1 className="text-5xl md:text-7xl font-bold font-display text-white mb-6 tracking-tight drop-shadow-lg">
-                        Discover Your <br />
-                        <span className="text-transparent bg-clip-text bg-gradient-to-r from-rose-300 via-pink-300 to-purple-400">Perfect Match</span>
-                    </h1>
-                    
-                    <p className="text-white/80 text-lg max-w-2xl mx-auto mb-10 leading-relaxed font-medium">
-                        We've analyzed profiles based on your lifestyle, values, and preferences to bring you the most compatible connections.
-                    </p>
-
-                    <Link
-                        to="/services/marriage"
-                        className="inline-flex items-center gap-2 text-white/50 hover:text-white transition-colors text-sm font-semibold uppercase tracking-widest hover:bg-white/10 px-6 py-2 rounded-full"
-                    >
-                        <ArrowLeft size={16} />
-                        Back to Matrimony
-                    </Link>
-                </div>
-            </section>
-
-            {/* ─── Floating Filter ─── */}
-            <FloatingFilterBar 
-                filters={filters} 
-                setFilters={setFilters} 
-                stats={{ total: profiles.length, filtered: sortedProfiles.length }} 
-            />
-
-            <div className="container-custom mt-12 px-4 sm:px-6">
-                {loading ? (
-                    <div className="flex flex-col items-center justify-center py-32 gap-6">
-                        <div className="relative">
-                            <div className="w-24 h-24 rounded-full border-4 border-rose-100 border-t-rose-500 animate-[spin_2s_linear_infinite]" />
-                            <Heart className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-rose-500 animate-pulse" fill="currentColor" size={28} />
+                {/* Navbar / Breadcrumbs Header */}
+                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8 bg-white p-5 rounded-3xl shadow-sm border border-gray-100">
+                    <div className="flex items-center gap-4">
+                        <Link 
+                            to="/services/marriage" 
+                            className="w-10 h-10 rounded-full bg-gray-50 flex items-center justify-center text-gray-400 hover:text-gray-900 hover:bg-gray-100 transition-all border border-gray-200"
+                            title="Back to Matrimony"
+                        >
+                            <ArrowLeft size={18} />
+                        </Link>
+                        <div>
+                            <h1 className="text-2xl font-bold font-display text-gray-900 leading-tight">Your Matches</h1>
+                            <p className="text-xs text-gray-500 font-medium">Find your perfect connection based on your preferences</p>
                         </div>
-                        <p className="text-gray-500 font-bold tracking-wide uppercase text-sm">Curating your matches...</p>
                     </div>
-                ) : (
-                    <AnimatePresence mode="wait">
-                        {sortedProfiles.length === 0 ? (
-                            <motion.div 
-                                initial={{ opacity: 0, y: 20 }} 
-                                animate={{ opacity: 1, y: 0 }} 
-                                exit={{ opacity: 0, y: -20 }}
-                                className="text-center py-20 bg-white rounded-3xl shadow-xl border border-gray-100 max-w-2xl mx-auto"
-                            >
-                                <div className="w-24 h-24 bg-gradient-to-br from-gray-50 to-rose-50 rounded-full flex items-center justify-center mx-auto mb-6 shadow-inner border border-rose-100/50">
-                                    <Search size={32} className="text-rose-400" />
-                                </div>
-                                <h3 className="text-2xl font-bold text-gray-800 mb-2 font-display">No Matches Found</h3>
-                                <p className="text-gray-500 mb-8 px-8">We couldn't find any profiles matching your current filters. Try broadening your criteria or checking back later.</p>
-                                <button
-                                    onClick={() => setFilters({ gender: '', ageRange: 'Any Age', religion: '', maritalStatus: '' })}
-                                    className="px-8 py-3 rounded-full bg-gray-900 text-white font-bold hover:bg-rose-500 transition-colors shadow-lg"
-                                >
-                                    Clear All Filters
-                                </button>
-                            </motion.div>
-                        ) : (
-                            <motion.div 
-                                initial={{ opacity: 0 }}
-                                animate={{ opacity: 1 }}
-                                className="space-y-16"
-                            >
-                                {/* Top Matches Section */}
-                                {topMatches.length > 0 && (
-                                    <section>
-                                        <div className="flex flex-col md:flex-row md:items-end justify-between mb-8 gap-4 px-2">
-                                            <div>
-                                                <h2 className="text-3xl font-bold text-gray-900 font-display flex items-center gap-3">
-                                                    Top Recommendations
-                                                    <span className="bg-gradient-to-r from-rose-500 to-pink-500 text-white text-[10px] px-3 py-1 rounded-full uppercase tracking-wider font-bold shadow-md">Premium</span>
-                                                </h2>
-                                                <p className="text-gray-500 mt-2 font-medium">Exceptional profiles with 75%+ compatibility rating</p>
-                                            </div>
-                                        </div>
-                                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                                            {topMatches.map((profile, idx) => (
-                                                <MatchCard key={profile.id} profile={profile} myProfile={matrimonyProfile} onViewProfile={setSelectedProfile} index={idx} />
-                                            ))}
-                                        </div>
-                                    </section>
-                                )}
+                    
+                    <button 
+                        onClick={openProfile}
+                        className="flex items-center gap-3 px-4 py-2 rounded-full border border-gray-200 bg-white hover:bg-gray-50 transition-colors group cursor-pointer"
+                    >
+                        <div className="flex flex-col items-end">
+                            <span className="text-[10px] text-gray-400 font-bold uppercase tracking-widest leading-none mb-1">Logged In</span>
+                            <span className="text-sm font-bold text-gray-800 leading-none group-hover:text-rose-500 transition-colors">
+                                {matrimonyProfile?.firstName} {matrimonyProfile?.lastName}
+                            </span>
+                        </div>
+                        <div className="w-10 h-10 rounded-full bg-rose-100 flex items-center justify-center border border-rose-200 overflow-hidden">
+                            {matrimonyProfile?.profilePhoto ? (
+                                <img src={`http://localhost:5000${matrimonyProfile.profilePhoto}`} alt="You" className="w-full h-full object-cover" />
+                            ) : (
+                                <User size={16} className="text-rose-500" />
+                            )}
+                        </div>
+                    </button>
+                </div>
 
-                                {/* Other Matches Section */}
-                                {standardMatches.length > 0 && (
-                                    <section>
-                                        <div className="mb-8 px-2">
-                                            <h2 className="text-2xl font-bold text-gray-900 font-display flex items-center gap-3">
-                                                More Profiles to Explore
-                                            </h2>
-                                            <div className="w-12 h-1 bg-rose-200 rounded-full mt-3" />
+                <div className="flex flex-col lg:flex-row gap-8">
+                    
+                    {/* Left Sidebar Filters */}
+                    <div className="w-full lg:w-[280px] shrink-0">
+                        <FilterSidebar 
+                            filters={filters} 
+                            setFilters={setFilters} 
+                            stats={{ total: profiles.length, filtered: sortedProfiles.length }} 
+                        />
+                    </div>
+
+                    {/* Right Main Content */}
+                    <div className="flex-1 min-w-0">
+                        {loading ? (
+                            <div className="flex flex-col items-center justify-center py-32 bg-white rounded-3xl border border-gray-100 shadow-sm h-[600px]">
+                                <div className="relative">
+                                    <div className="w-20 h-20 rounded-full border-4 border-gray-100 border-t-rose-500 animate-[spin_1.5s_linear_infinite]" />
+                                    <Heart className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-rose-500 animate-pulse" fill="currentColor" size={24} />
+                                </div>
+                                <p className="text-gray-400 font-bold tracking-widest uppercase text-xs mt-6">Analyzing Compatibility...</p>
+                            </div>
+                        ) : (
+                            <AnimatePresence mode="wait">
+                                {sortedProfiles.length === 0 ? (
+                                    <motion.div 
+                                        initial={{ opacity: 0, scale: 0.98 }} 
+                                        animate={{ opacity: 1, scale: 1 }} 
+                                        exit={{ opacity: 0 }}
+                                        className="text-center py-24 bg-white rounded-3xl shadow-sm border border-gray-100 h-[600px] flex flex-col items-center justify-center"
+                                    >
+                                        <div className="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-6 border border-gray-100">
+                                            <Search size={28} className="text-gray-300" />
                                         </div>
-                                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                                            {standardMatches.map((profile, idx) => (
-                                                <MatchCard key={profile.id} profile={profile} myProfile={matrimonyProfile} onViewProfile={setSelectedProfile} index={idx + topMatches.length} />
-                                            ))}
-                                        </div>
-                                    </section>
+                                        <h3 className="text-2xl font-bold text-gray-900 mb-2 font-display">No Matches Found</h3>
+                                        <p className="text-gray-500 mb-8 max-w-sm mx-auto text-sm">We couldn't find any active profiles matching your current filters. Broaden your criteria to see more people.</p>
+                                        <button
+                                            onClick={() => setFilters({ gender: '', ageRange: 'Any Age', religion: '', maritalStatus: '' })}
+                                            className="px-6 py-2.5 rounded-full bg-rose-50 text-rose-600 font-bold hover:bg-rose-100 hover:text-rose-700 transition-colors text-sm"
+                                        >
+                                            Clear All Filters
+                                        </button>
+                                    </motion.div>
+                                ) : (
+                                    <motion.div 
+                                        initial={{ opacity: 0 }}
+                                        animate={{ opacity: 1 }}
+                                        className="space-y-12"
+                                    >
+                                        {/* Top Matches Section */}
+                                        {topMatches.length > 0 && (
+                                            <section>
+                                                <div className="flex items-center gap-3 mb-6 px-1">
+                                                    <div className="w-8 h-8 rounded-full bg-gradient-to-br from-rose-400 to-pink-500 flex items-center justify-center shadow-sm">
+                                                        <Sparkles size={14} className="text-white" />
+                                                    </div>
+                                                    <h2 className="text-xl font-bold text-gray-900 font-display">Premium Matches</h2>
+                                                    <span className="bg-rose-100 text-rose-600 text-[10px] px-2 py-0.5 rounded-full uppercase tracking-widest font-bold ml-2">Recommended</span>
+                                                </div>
+                                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                                                    {topMatches.map((profile, idx) => (
+                                                        <MatchCard key={profile.id} profile={profile} myProfile={matrimonyProfile} onViewProfile={setSelectedProfile} index={idx} />
+                                                    ))}
+                                                </div>
+                                            </section>
+                                        )}
+
+                                        {/* Other Matches Section */}
+                                        {standardMatches.length > 0 && (
+                                            <section>
+                                                <div className="flex items-center gap-3 mb-6 px-1 mt-10">
+                                                    <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center text-gray-500">
+                                                        <Users size={14} />
+                                                    </div>
+                                                    <h2 className="text-xl font-bold text-gray-900 font-display">Discover More</h2>
+                                                    <span className="text-gray-400 text-sm ml-2 font-medium">{standardMatches.length} profiles</span>
+                                                </div>
+                                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                                                    {standardMatches.map((profile, idx) => (
+                                                        <MatchCard key={profile.id} profile={profile} myProfile={matrimonyProfile} onViewProfile={setSelectedProfile} index={idx + topMatches.length} />
+                                                    ))}
+                                                </div>
+                                            </section>
+                                        )}
+                                    </motion.div>
                                 )}
-                            </motion.div>
+                            </AnimatePresence>
                         )}
-                    </AnimatePresence>
-                )}
+                    </div>
+                </div>
             </div>
 
             {/* Modals */}

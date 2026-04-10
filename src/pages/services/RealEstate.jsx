@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { 
     Building, MapPin, Hammer, CheckCircle, ArrowRight, Sparkles, 
     Home, Landmark, Users, Plus, Search, Filter, Camera, 
-    X, Tag, Phone, IndianRupee, Clock, User
+    X, Tag, Phone, IndianRupee, Clock, User, AlertTriangle
 } from 'lucide-react';
 import { useUI } from '../../context/UIContext';
 
@@ -12,6 +12,7 @@ const RealEstate = () => {
     const [activeTab, setActiveTab] = useState('all');
     const [searchQuery, setSearchQuery] = useState('');
     const [isFormOpen, setIsFormOpen] = useState(false);
+    const [deleteConfirmId, setDeleteConfirmId] = useState(null);
     
     // Initial static data
     const initialListings = [
@@ -68,14 +69,25 @@ const RealEstate = () => {
         }
     ];
 
-    const [listings, setListings] = useState(() => {
-        const saved = localStorage.getItem('real_estate_listings');
-        return saved ? JSON.parse(saved) : initialListings;
-    });
+    const [listings, setListings] = useState([]);
 
     useEffect(() => {
-        localStorage.setItem('real_estate_listings', JSON.stringify(listings));
-    }, [listings]);
+        const fetchProperties = async () => {
+            try {
+                const res = await fetch('http://localhost:5000/api/real-estate');
+                const data = await res.json();
+                if (data.success && data.data) {
+                    setListings([...data.data, ...initialListings]);
+                } else {
+                    setListings(initialListings);
+                }
+            } catch (error) {
+                console.error("Error fetching listings:", error);
+                setListings(initialListings);
+            }
+        };
+        fetchProperties();
+    }, []);
 
     const [newAd, setNewAd] = useState({
         title: '',
@@ -127,22 +139,45 @@ const RealEstate = () => {
         }
     };
 
-    const handleAddListing = (e) => {
+    const handleAddListing = async (e) => {
         e.preventDefault();
         const ad = {
             ...newAd,
-            id: Date.now(),
+            id: Date.now().toString(),
+            sellerId: user?.id,
             date: new Date().toLocaleDateString(),
             img: newAd.img || "https://images.unsplash.com/photo-1560518883-ce09059eeffa?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
         };
-        setListings([ad, ...listings]);
-        setIsFormOpen(false);
-        setNewAd({ title: '', price: '', location: '', category: 'property', type: 'Apartment', description: '', beds: '', seller: '', contact: '', img: '', size: '', document: '' });
+        try {
+            await fetch('http://localhost:5000/api/real-estate', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(ad)
+            });
+            setListings([ad, ...listings]);
+            setIsFormOpen(false);
+            setNewAd({ title: '', price: '', location: '', category: 'property', type: 'Apartment', description: '', beds: '', seller: '', contact: '', img: '', size: '', document: '' });
+        } catch (error) {
+            console.error("Failed to add listing:", error);
+        }
     };
 
-    const handleDeleteListing = (id) => {
-        if(window.confirm('Are you sure you want to delete this listing?')) {
+    const confirmDelete = (id) => {
+        setDeleteConfirmId(id);
+    };
+
+    const executeDelete = async () => {
+        const id = deleteConfirmId;
+        if (!id) return;
+        try {
+            if (typeof id === 'string') {
+                await fetch(`http://localhost:5000/api/real-estate/${id}`, { method: 'DELETE' });
+            }
             setListings(listings.filter(l => l.id !== id));
+        } catch (error) {
+            console.error("Failed to delete listing:", error);
+        } finally {
+            setDeleteConfirmId(null);
         }
     };
 
@@ -151,7 +186,7 @@ const RealEstate = () => {
             {/* Hero Section */}
             <section className="relative rounded-[2.5rem] margin-x-custom mx-4 md:mx-6 mb-8 overflow-hidden min-h-[400px] flex items-center shadow-2xl shadow-emerald-100/50">
                 <div className="absolute inset-0">
-                    <img src="https://images.unsplash.com/photo-1448630360428-654566395e1e?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80" alt="Real Estate" className="w-full h-full object-cover" />
+                    <img src="https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80" alt="Real Estate" className="w-full h-full object-cover" />
                     <div className="absolute inset-0 bg-gradient-to-r from-emerald-950/90 via-emerald-900/40 to-transparent"></div>
                 </div>
 
@@ -254,13 +289,15 @@ const RealEstate = () => {
                                         <div className="bg-emerald-600/90 backdrop-blur px-3 py-1.5 rounded-full text-[10px] font-bold text-white uppercase tracking-wider">
                                             {prop.category}
                                         </div>
-                                        <button 
-                                            onClick={() => handleDeleteListing(prop.id)}
-                                            className="p-1.5 bg-red-500/80 backdrop-blur rounded-full text-white hover:bg-red-600 transition-colors shadow-sm"
-                                            title="Delete Listing"
-                                        >
-                                            <X size={14} />
-                                        </button>
+                                        {user && prop.sellerId === user.id && (
+                                            <button 
+                                                onClick={() => confirmDelete(prop.id)}
+                                                className="p-1.5 bg-red-500/80 backdrop-blur rounded-full text-white hover:bg-red-600 transition-colors shadow-sm"
+                                                title="Delete Listing"
+                                            >
+                                                <X size={14} />
+                                            </button>
+                                        )}
                                     </div>
                                     <div className="absolute bottom-4 left-4 right-4 flex justify-between items-center">
                                         <div className="px-3 py-1 rounded-lg bg-black/40 backdrop-blur text-white text-xs flex items-center gap-1">
@@ -314,7 +351,7 @@ const RealEstate = () => {
 
             {/* Floating Action Button for Mobile */}
             <button 
-                onClick={() => setIsFormOpen(true)}
+                onClick={() => user ? setIsFormOpen(true) : openLogin()}
                 className="md:hidden fixed bottom-6 right-6 w-14 h-14 bg-emerald-600 text-white rounded-full shadow-2xl flex items-center justify-center z-40 hover:scale-110 transition-transform active:scale-95"
             >
                 <Plus size={28} />
@@ -526,6 +563,48 @@ const RealEstate = () => {
                                         </button>
                                     </div>
                                 </form>
+                            </div>
+                        </motion.div>
+                    </div>
+                )}
+            </AnimatePresence>
+
+            {/* Delete Confirmation Modal */}
+            <AnimatePresence>
+                {deleteConfirmId && (
+                    <div className="fixed inset-0 z-[110] flex items-center justify-center p-4">
+                        <motion.div 
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            onClick={() => setDeleteConfirmId(null)}
+                            className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm"
+                        />
+                        <motion.div 
+                            initial={{ opacity: 0, scale: 0.95, y: 20 }}
+                            animate={{ opacity: 1, scale: 1, y: 0 }}
+                            exit={{ opacity: 0, scale: 0.95, y: 20 }}
+                            className="relative w-full max-w-md bg-white rounded-3xl shadow-2xl overflow-hidden p-8 text-center"
+                        >
+                            <div className="w-16 h-16 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-6">
+                                <AlertTriangle size={32} className="text-red-500" />
+                            </div>
+                            <h3 className="text-2xl font-bold text-slate-900 mb-2 font-display">Delete Listing?</h3>
+                            <p className="text-slate-500 mb-8">Are you sure you want to permanently delete this property listing? This action cannot be undone.</p>
+                            
+                            <div className="flex gap-4">
+                                <button 
+                                    onClick={() => setDeleteConfirmId(null)}
+                                    className="flex-1 py-3.5 border border-slate-200 text-slate-600 rounded-xl font-bold hover:bg-slate-50 transition-all"
+                                >
+                                    Cancel
+                                </button>
+                                <button 
+                                    onClick={executeDelete}
+                                    className="flex-1 py-3.5 bg-red-500 text-white rounded-xl font-bold hover:bg-red-600 transition-all shadow-lg shadow-red-200"
+                                >
+                                    Delete
+                                </button>
                             </div>
                         </motion.div>
                     </div>

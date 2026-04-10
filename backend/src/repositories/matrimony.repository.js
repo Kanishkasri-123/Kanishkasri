@@ -84,4 +84,9 @@ async function findByEmail(email) {
   return rows[0] || null;
 }
 
-module.exports = { findAll, findById, findActive, create, updateById, findByUserId, findByEmail };
+async function deleteById(id) {
+  const { rowCount } = await db.query('DELETE FROM matrimony_profiles WHERE id = $1', [id]);
+  return rowCount > 0;
+}
+
+module.exports = { findAll, findById, findActive, create, updateById, findByUserId, findByEmail, deleteById };
